@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wellington Roveder — Dev Python</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --bg2: #111111;
+    --bg3: #181818;
+    --border: #222222;
+    --accent: #00ff88;
+    --accent2: #00cc6a;
+    --text: #e8e8e8;
+    --muted: #555555;
+    --muted2: #888888;
+    --warn: #ffaa00;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Efeito de ruído sutil no fundo */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.4;
+  }
+
+  .cursor { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999; transition: transform 0.1s; mix-blend-mode: difference; }
+  .cursor-ring { width: 32px; height: 32px; border: 1px solid var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9998; transition: all 0.15s ease; opacity: 0.5; }
+
+  ::-webkit-scrollbar { width: 2px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--accent); }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 20px 48px;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid var(--border); background: rgba(10,10,10,0.92); backdrop-filter: blur(12px);
+  }
+
+  .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; color: var(--accent); }
+  .nav-logo span { color: var(--muted2); font-weight: 400; }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { color: var(--muted2); text-decoration: none; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; transition: 0.2s; }
+  .nav-links a:hover { color: var(--accent); }
+
+  #hero { min-height: 100vh; display: flex; align-items: center; padding: 120px 48px 80px; position: relative; overflow: hidden; }
+  .hero-grid { position: absolute; inset: 0; background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 60px 60px; opacity: 0.3; mask-image: radial-gradient(ellipse at 20% 50%, black 30%, transparent 80%); }
+  .hero-content { position: relative; z-index: 2; max-width: 800px; }
+  .hero-tag { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; color: var(--accent); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 32px; }
+  .hero-tag::before { content: ''; width: 24px; height: 1px; background: var(--accent); }
+  .hero-name { font-family: 'Syne', sans-serif; font-size: clamp(52px, 8vw, 96px); font-weight: 800; line-height: 0.95; letter-spacing: -3px; margin-bottom: 24px; }
+  .hero-name .line2 { color: transparent; -webkit-text-stroke: 1px var(--muted); }
+  .hero-name .accent { color: var(--accent); }
+  .hero-desc { font-size: 14px; line-height: 1.8; color: var(--muted2); max-width: 520px; margin-bottom: 48px; }
+  .hero-desc strong { color: var(--text); }
+
+  .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; background: var(--accent); color: #000; text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; transition: 0.2s; clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px)); }
+  .btn-primary:hover { background: var(--accent2); transform: translateY(-2px); }
+  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border: 1px solid var(--border); color: var(--muted2); text-decoration: none; font-size: 12px; text-transform: uppercase; transition: 0.2s; }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  section { padding: 100px 48px; }
+  .section-header { display: flex; align-items: center; gap: 16px; margin-bottom: 64px; }
+  .section-num { font-size: 11px; color: var(--accent); letter-spacing: 3px; }
+  .section-title { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; }
+  .section-line { flex: 1; height: 1px; background: var(--border); max-width: 200px; }
+
+  .stack-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+  .stack-item { padding: 20px; border: 1px solid var(--border); background: var(--bg2); transition: 0.2s; position: relative; }
+  .stack-item:hover { border-color: var(--accent); background: var(--bg3); transform: translateY(-2px); }
+  .stack-icon { font-size: 24px; margin-bottom: 12px; }
+  .stack-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .stack-level { font-size: 10px; text-transform: uppercase; }
+  .stack-level.iniciante { color: var(--warn); }
+  .stack-level.intermediario { color: var(--accent); }
+
+  .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 24px; }
+  .project-card { border: 1px solid var(--border); background: var(--bg); padding: 40px; position: relative; transition: 0.3s; }
+  .project-card:hover { border-color: var(--accent); transform: translateY(-4px); }
+  .project-badge { position: absolute; top: 24px; right: 24px; padding: 4px 10px; border: 1px solid var(--accent); font-size: 9px; color: var(--accent); text-transform: uppercase; }
+  .project-badge.dev { border-color: var(--warn); color: var(--warn); }
+  .project-num { font-size: 48px; font-family: 'Syne', sans-serif; font-weight: 800; color: var(--border); margin-bottom: 15px; }
+  .project-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; margin-bottom: 12px; }
+  .project-desc { font-size: 13px; color: var(--muted2); line-height: 1.7; margin-bottom: 24px; }
+  .tag { display: inline-block; padding: 4px 12px; border: 1px solid var(--border); font-size: 10px; color: var(--muted2); margin: 0 4px 8px 0; text-transform: uppercase; }
+  .tag.highlight { border-color: var(--accent); color: var(--accent); }
+  .project-link { color: var(--accent); text-decoration: none; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+
+  .about-grid { display: grid; grid-template-columns: 280px 1fr 1fr; gap: 48px; }
+  .about-photo { border: 1px solid var(--border); padding: 10px; background: var(--bg2); }
+  .about-photo img { width: 100%; filter: grayscale(100%); transition: 0.3s; }
+  .about-photo:hover img { filter: grayscale(0%); }
+  .about-text p { font-size: 14px; color: var(--muted2); line-height: 1.9; margin-bottom: 16px; }
+  .about-text strong { color: var(--accent); }
+
+  .skill-row { margin-bottom: 20px; }
+  .skill-header { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px; }
+  .skill-bar { height: 2px; background: var(--border); }
+  .skill-fill { height: 100%; background: var(--accent); width: 0; transition: width 1.5s ease; }
+
+  .contact-title { font-family: 'Syne', sans-serif; font-size: clamp(40px, 6vw, 72px); font-weight: 800; text-align: center; margin-bottom: 40px; }
+  .contact-title span { color: transparent; -webkit-text-stroke: 1px var(--muted); }
+  .contact-links { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+
+  .reveal { opacity: 0; transform: translateY(30px); transition: 0.8s ease-out; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 900px) {
+    .about-grid { grid-template-columns: 1fr; }
+    .projects-grid { grid-template-columns: 1fr; }
+    nav { padding: 20px; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<nav>
+  <div class="nav-logo">WR<span>.dev</span></div>
+  <ul class="nav-links">
+    <li><a href="#stack">Stack</a></li>
+    <li><a href="#projects">Projetos</a></li>
+    <li><a href="#about">Sobre</a></li>
+  </ul>
+</nav>
+
+<section id="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-tag">Disponível para Estágio / Júnior</div>
+    <h1 class="hero-name">
+      Wellington<br><span class="line2">Danilo</span><br><span class="accent">Roveder_</span>
+    </h1>
+    <p class="hero-desc">
+      Desenvolvedor Python focado em <strong>automação de processos e engenharia de dados</strong>. 
+      Utilizo 10 anos de experiência operacional para transformar fluxos manuais complexos em sistemas eficientes e escaláveis.
+    </p>
+    <div class="hero-cta">
+      <a href="#projects" class="btn-primary">→ Ver Projetos</a>
+      <a href="https://github.com/Wellington-Roveder" target="_blank" class="btn-secondary">GitHub ↗</a>
+    </div>
+  </div>
+</section>
+
+<section id="stack">
+  <div class="section-header reveal">
+    <span class="section-num">01</span>
+    <h2 class="section-title">Stack Técnica</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="stack-grid reveal">
+    <div class="stack-item"><div class="stack-icon">🐍</div><div class="stack-name">Python</div><div class="stack-level intermediario">Intermediário</div></div>
+    <div class="stack-item"><div class="stack-icon">⚡</div><div class="stack-name">FastAPI</div><div class="stack-level intermediario">Intermediário</div></div>
+    <div class="stack-item"><div class="stack-icon">🎸</div><div class="stack-name">Django</div><div class="stack-level intermediario">Em Evolução</div></div>
+    <div class="stack-item"><div class="stack-icon">🔄</div><div class="stack-name">n8n / Automate</div><div class="stack-level intermediario">Intermediário</div></div>
+    <div class="stack-item"><div class="stack-icon">🐳</div><div class="stack-name">Docker</div><div class="stack-level iniciante">Iniciante</div></div>
+    <div class="stack-item"><div class="stack-icon">🐙</div><div class="stack-name">Git / GitHub</div><div class="stack-level intermediario">Aperfeiçoando</div></div>
+    <div class="stack-item"><div class="stack-icon">📊</div><div class="stack-name">Pandas / ETL</div><div class="stack-level intermediario">Intermediário</div></div>
+    <div class="stack-item"><div class="stack-icon">🐘</div><div class="stack-name">PostgreSQL / SQL</div><div class="stack-level intermediario">Intermediário</div></div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="section-header reveal">
+    <span class="section-num">02</span>
+    <h2 class="section-title">Projetos</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="projects-grid">
+    <!-- PROJETO 01 -->
+    <div class="project-card reveal">
+      <div class="project-badge">Em Produção</div>
+      <div class="project-num">01</div>
+      <h3 class="project-title">FechaBot MVP</h3>
+      <p class="project-desc">Solução real de automação comercial. Reduzi processos de fechamento de caixa de 20 min para 30 segundos, processando planilhas PDV e gerando relatórios formatados.</p>
+      <div class="project-tags">
+        <span class="tag highlight">Python</span><span class="tag highlight">Pandas</span><span class="tag">Tkinter</span>
+      </div>
+      <a href="https://github.com/Wellington-Roveder/FechaBot-MVP" target="_blank" class="project-link">GitHub →</a>
+    </div>
+
+    <!-- PROJETO 02 -->
+    <div class="project-card reveal">
+      <div class="project-num">02</div>
+      <h3 class="project-title">Django CRUD System</h3>
+      <p class="project-desc">Aplicação completa utilizando o padrão MVT. Implementação de persistência de dados, autenticação e gerenciamento de registros em banco de dados relacional.</p>
+      <div class="project-tags">
+        <span class="tag highlight">Django</span><span class="tag highlight">PostgreSQL</span><span class="tag">Python</span>
+      </div>
+      <a href="https://github.com/Wellington-Roveder/Django-Crud" target="_blank" class="project-link">GitHub →</a>
+    </div>
+
+    <!-- PROJETO 03 -->
+    <div class="project-card reveal">
+      <div class="project-badge dev">Em Desenvolvimento</div>
+      <div class="project-num">03</div>
+      <h3 class="project-title">FechaBot SaaS</h3>
+      <p class="project-desc">Evolução do MVP para a nuvem. Arquitetura escalável com integração de API de WhatsApp, banco de dados relacional e containers.</p>
+      <div class="project-tags">
+        <span class="tag highlight">Django</span><span class="tag highlight">PostgreSQL</span><span class="tag">Docker</span>
+      </div>
+    </div>
+
+    <!-- PROJETO 04 -->
+    <div class="project-card reveal">
+      <div class="project-num">04</div>
+      <h3 class="project-title">SentinelLog</h3>
+      <p class="project-desc">Monitor de preços com pipeline ETL completo. Integra FastAPI com n8n para alertas automáticos e dashboard em Streamlit.</p>
+      <div class="project-tags">
+        <span class="tag highlight">FastAPI</span><span class="tag highlight">n8n</span><span class="tag">SQLite</span><span class="tag">Streamlit</span>
+      </div>
+      <a href="https://github.com/Wellington-Roveder/SentinelLog-game-price-monitor" target="_blank" class="project-link">GitHub →</a>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="section-header reveal">
+    <span class="section-num">03</span>
+    <h2 class="section-title">Sobre Mim</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="about-grid">
+    <div class="about-photo reveal">
+      <img src="eu_profissional.png" alt="Wellington Roveder">
+    </div>
+    <div class="about-text reveal">
+      <p>Sou estudante de <strong>Ciência da Computação</strong> e atualmente Gerente de Plantão no McDonald's (há 10 anos).</p>
+      <p>Gerenciar operações de alto volume me ensinou a ter <strong>foco absoluto em resultados</strong> e a construir sistemas que não falham sob pressão. Trago essa mentalidade "pé no chão" para o desenvolvimento de software.</p>
+      <p>Meu objetivo é consolidar minha transição para o backend, criando automações que gerem valor real para empresas e usuários.</p>
+    </div>
+    <div class="skills-list reveal">
+      <div class="skill-row">
+        <div class="skill-header"><span>Liderança e Processos</span><span>95%</span></div>
+        <div class="skill-bar"><div class="skill-fill" data-width="95"></div></div>
+      </div>
+      <div class="skill-row">
+        <div class="skill-header"><span>Python / Automação</span><span>85%</span></div>
+        <div class="skill-bar"><div class="skill-fill" data-width="85"></div></div>
+      </div>
+      <div class="skill-row">
+        <div class="skill-header"><span>Resolução de Problemas</span><span>90%</span></div>
+        <div class="skill-bar"><div class="skill-fill" data-width="90"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <h2 class="contact-title reveal">Vamos <span>conversar?</span></h2>
+  <div class="contact-links reveal">
+    <a href="mailto:rovederwellington@gmail.com" class="btn-primary">✉ Email</a>
+    <a href="https://www.linkedin.com/in/wellington-roveder-04637b37b/" target="_blank" class="btn-secondary">LinkedIn</a>
+  </div>
+</section>
+
+<footer style="padding: 48px; text-align: center; font-size: 11px; color: var(--muted); border-top: 1px solid var(--border);">
+  © 2026 Wellington Roveder • Construído com Python & Criatividade.
+</footer>
+
+<script>
+  // Cursor customizado
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX; mouseY = e.clientY;
+    cursor.style.left = mouseX - 4 + 'px'; cursor.style.top = mouseY - 4 + 'px';
+  });
+
+  function animateRing() {
+    ringX += (mouseX - ringX) * 0.15; ringY += (mouseY - ringY) * 0.15;
+    ring.style.left = ringX - 16 + 'px'; ring.style.top = ringY - 16 + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  // Revelar ao scroll
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        const fills = entry.target.querySelectorAll('.skill-fill');
+        fills.forEach(f => f.style.width = f.dataset.width + '%');
+      }
+    });
+  }, { threshold: 0.2 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
