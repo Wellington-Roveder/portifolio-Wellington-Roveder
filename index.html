@@ -29,7 +29,6 @@
     cursor: none;
   }
 
-  /* Efeito de ruído sutil no fundo */
   body::before {
     content: '';
     position: fixed;
@@ -100,7 +99,11 @@
   .project-desc { font-size: 13px; color: var(--muted2); line-height: 1.7; margin-bottom: 24px; }
   .tag { display: inline-block; padding: 4px 12px; border: 1px solid var(--border); font-size: 10px; color: var(--muted2); margin: 0 4px 8px 0; text-transform: uppercase; }
   .tag.highlight { border-color: var(--accent); color: var(--accent); }
-  .project-link { color: var(--accent); text-decoration: none; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+  .project-links { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+  .project-link { color: var(--accent); text-decoration: none; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; }
+  .project-link:hover { color: var(--accent2); }
+  .project-link.live { color: var(--warn); }
+  .project-link.live:hover { color: #cc8800; }
 
   .about-grid { display: grid; grid-template-columns: 280px 1fr 1fr; gap: 48px; }
   .about-photo { border: 1px solid var(--border); padding: 10px; background: var(--bg2); }
@@ -154,7 +157,7 @@
       Desenvolvedor Python focado em <strong>automação de processos e engenharia de dados</strong>. 
       Utilizo 10 anos de experiência operacional para transformar fluxos manuais complexos em sistemas eficientes e escaláveis.
     </p>
-    <div class="hero-cta">
+    <div style="display:flex; gap:16px; flex-wrap:wrap;">
       <a href="#projects" class="btn-primary">→ Ver Projetos</a>
       <a href="https://github.com/Wellington-Roveder" target="_blank" class="btn-secondary">GitHub ↗</a>
     </div>
@@ -186,50 +189,60 @@
     <div class="section-line"></div>
   </div>
   <div class="projects-grid">
+
     <!-- PROJETO 01 -->
     <div class="project-card reveal">
       <div class="project-badge">Em Produção</div>
       <div class="project-num">01</div>
       <h3 class="project-title">FechaBot MVP</h3>
-      <p class="project-desc">Solução real de automação comercial. Reduzi processos de fechamento de caixa de 20 min para 30 segundos, processando planilhas PDV e gerando relatórios formatados.</p>
-      <div class="project-tags">
-        <span class="tag highlight">Python</span><span class="tag highlight">Pandas</span><span class="tag">Tkinter</span>
+      <p class="project-desc">Solução real de automação comercial implantada na Pollo Loko (SJC). Reduziu o fechamento de caixa de 20 min para 30 segundos — lê planilha PDV, processa com Pandas e gera relatório pronto para WhatsApp como .exe portátil.</p>
+      <div class="project-tags" style="margin-bottom:20px;">
+        <span class="tag highlight">Python</span><span class="tag highlight">Pandas</span><span class="tag">Tkinter</span><span class="tag">PyInstaller</span>
       </div>
-      <a href="https://github.com/Wellington-Roveder/FechaBot-MVP" target="_blank" class="project-link">GitHub →</a>
+      <div class="project-links">
+        <a href="https://github.com/Wellington-Roveder/FechaBot-MVP" target="_blank" class="project-link">GitHub →</a>
+      </div>
     </div>
 
     <!-- PROJETO 02 -->
     <div class="project-card reveal">
+      <div class="project-badge">Em Produção</div>
       <div class="project-num">02</div>
-      <h3 class="project-title">Django CRUD System</h3>
-      <p class="project-desc">Aplicação completa utilizando o padrão MVT. Implementação de persistência de dados, autenticação e gerenciamento de registros em banco de dados relacional.</p>
-      <div class="project-tags">
-        <span class="tag highlight">Django</span><span class="tag highlight">PostgreSQL</span><span class="tag">Python</span>
+      <h3 class="project-title">Django Produtos API</h3>
+      <p class="project-desc">API REST completa com autenticação JWT, rate limiting, containerização Docker e deploy em produção no Render. CRUD de produtos com PostgreSQL, testes automatizados e HTTPS configurado.</p>
+      <div class="project-tags" style="margin-bottom:20px;">
+        <span class="tag highlight">Django</span><span class="tag highlight">PostgreSQL</span><span class="tag highlight">JWT</span><span class="tag">Docker</span>
       </div>
-      <a href="https://github.com/Wellington-Roveder/Django-Crud" target="_blank" class="project-link">GitHub →</a>
+      <div class="project-links">
+        <a href="https://github.com/Wellington-Roveder/django-produtos-api" target="_blank" class="project-link">GitHub →</a>
+        <a href="https://django-produtos-api.onrender.com/api" target="_blank" class="project-link live">API ao vivo ↗</a>
+      </div>
     </div>
 
     <!-- PROJETO 03 -->
     <div class="project-card reveal">
-      <div class="project-badge dev">Em Desenvolvimento</div>
       <div class="project-num">03</div>
-      <h3 class="project-title">FechaBot SaaS</h3>
-      <p class="project-desc">Evolução do MVP para a nuvem. Arquitetura escalável com integração de API de WhatsApp, banco de dados relacional e containers.</p>
-      <div class="project-tags">
-        <span class="tag highlight">Django</span><span class="tag highlight">PostgreSQL</span><span class="tag">Docker</span>
+      <h3 class="project-title">SentinelLog</h3>
+      <p class="project-desc">Pipeline ETL que monitora preços de jogos via API REST, persiste histórico em SQLite e detecta variações automaticamente. FastAPI expõe endpoint consumido pelo N8N para alertas por email, com dashboard interativo em Streamlit.</p>
+      <div class="project-tags" style="margin-bottom:20px;">
+        <span class="tag highlight">FastAPI</span><span class="tag highlight">n8n</span><span class="tag">SQLite</span><span class="tag">Streamlit</span>
+      </div>
+      <div class="project-links">
+        <a href="https://github.com/Wellington-Roveder/SentinelLog-game-price-monitor" target="_blank" class="project-link">GitHub →</a>
       </div>
     </div>
 
     <!-- PROJETO 04 -->
     <div class="project-card reveal">
+      <div class="project-badge dev">Em Desenvolvimento</div>
       <div class="project-num">04</div>
-      <h3 class="project-title">SentinelLog</h3>
-      <p class="project-desc">Monitor de preços com pipeline ETL completo. Integra FastAPI com n8n para alertas automáticos e dashboard em Streamlit.</p>
-      <div class="project-tags">
-        <span class="tag highlight">FastAPI</span><span class="tag highlight">n8n</span><span class="tag">SQLite</span><span class="tag">Streamlit</span>
+      <h3 class="project-title">FechaBot SaaS</h3>
+      <p class="project-desc">Evolução do MVP para a nuvem. Arquitetura multi-tenant com envio automático via WhatsApp, suporte a múltiplas lojas e dashboard centralizado — sem interação manual do usuário.</p>
+      <div class="project-tags" style="margin-bottom:20px;">
+        <span class="tag highlight">Django</span><span class="tag highlight">PostgreSQL</span><span class="tag">Docker</span><span class="tag">Redis</span>
       </div>
-      <a href="https://github.com/Wellington-Roveder/SentinelLog-game-price-monitor" target="_blank" class="project-link">GitHub →</a>
     </div>
+
   </div>
 </section>
 
@@ -278,7 +291,6 @@
 </footer>
 
 <script>
-  // Cursor customizado
   const cursor = document.getElementById('cursor');
   const ring = document.getElementById('cursorRing');
   let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
@@ -295,7 +307,6 @@
   }
   animateRing();
 
-  // Revelar ao scroll
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
