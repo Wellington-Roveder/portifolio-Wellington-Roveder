@@ -3,143 +3,193 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wellington Roveder — Dev Python</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<title>Wellington Roveder — Dev Python / Backend</title>
+<meta name="description" content="Wellington Roveder — desenvolvedor Python backend. FechaBot: automação de fechamento operacional com IA, do MVP em produção ao SaaS multi-tenant.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0a0a;
-    --bg2: #111111;
-    --bg3: #181818;
-    --border: #222222;
-    --accent: #00ff88;
-    --accent2: #00cc6a;
-    --text: #e8e8e8;
-    --muted: #555555;
-    --muted2: #888888;
-    --warn: #ffaa00;
+    --bg: #F7F5F1;
+    --surface: #EEEAE3;
+    --surface2: #E4DFD6;
+    --border: #DAD3C6;
+    --border2: #C9C0AF;
+    --graphite: #23221F;
+    --slate: #6B6E73;
+    --slate-light: #8C8E92;
+    --petrol: #17494A;
+    --petrol-dark: #0F3536;
+    --bronze: #8B5A2B;
+    --bronze-light: #A9744A;
+    --bordeaux: #6E2A38;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { scroll-behavior: smooth; }
   body {
     background: var(--bg);
-    color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
+    color: var(--graphite);
+    font-family: 'IBM Plex Sans', sans-serif;
     overflow-x: hidden;
-    cursor: none;
+    -webkit-font-smoothing: antialiased;
   }
 
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 1;
-    opacity: 0.4;
-  }
-
-  .cursor { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999; transition: transform 0.1s; mix-blend-mode: difference; }
-  .cursor-ring { width: 32px; height: 32px; border: 1px solid var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9998; transition: all 0.15s ease; opacity: 0.5; }
-
-  ::-webkit-scrollbar { width: 2px; }
+  ::selection { background: var(--petrol); color: var(--bg); }
+  ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--accent); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); }
+  :focus-visible { outline: 2px solid var(--petrol); outline-offset: 3px; }
+
+  a { color: inherit; }
 
   nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 20px 48px;
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 22px 48px;
     display: flex; justify-content: space-between; align-items: center;
-    border-bottom: 1px solid var(--border); background: rgba(10,10,10,0.92); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border); background: rgba(247,245,241,0.88); backdrop-filter: blur(10px);
   }
+  .nav-logo { font-family: 'Fraunces', serif; font-weight: 600; font-size: 19px; color: var(--graphite); letter-spacing: -0.3px; }
+  .nav-logo span { color: var(--slate-light); font-weight: 400; }
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a { color: var(--slate); text-decoration: none; font-size: 11px; letter-spacing: 1.6px; text-transform: uppercase; font-weight: 600; position: relative; padding-bottom: 3px; transition: color 0.25s; }
+  .nav-links a::after { content: ''; position: absolute; left: 0; bottom: 0; width: 0; height: 1px; background: var(--petrol); transition: width 0.3s ease; }
+  .nav-links a:hover { color: var(--petrol); }
+  .nav-links a:hover::after { width: 100%; }
 
-  .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; color: var(--accent); }
-  .nav-logo span { color: var(--muted2); font-weight: 400; }
-  .nav-links { display: flex; gap: 32px; list-style: none; }
-  .nav-links a { color: var(--muted2); text-decoration: none; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; transition: 0.2s; }
-  .nav-links a:hover { color: var(--accent); }
+  #hero { min-height: 96vh; display: flex; align-items: center; padding: 130px 48px 80px; position: relative; }
+  .hero-content { position: relative; z-index: 2; max-width: 780px; }
+  .hero-tag { display: inline-flex; align-items: center; gap: 10px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--petrol); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 30px; font-weight: 500; }
+  .hero-tag::before { content: ''; width: 20px; height: 1px; background: var(--petrol); }
+  .hero-name { font-family: 'Fraunces', serif; font-size: clamp(44px, 6.4vw, 78px); font-weight: 600; line-height: 1.04; letter-spacing: -1.5px; margin-bottom: 28px; color: var(--graphite); }
+  .hero-name em { font-style: italic; font-weight: 500; color: var(--petrol); }
+  .hero-desc { font-size: 16px; line-height: 1.8; color: var(--slate); max-width: 560px; margin-bottom: 24px; }
+  .hero-desc strong { color: var(--graphite); font-weight: 600; }
+  .hero-proof { display: flex; gap: 36px; flex-wrap: wrap; margin: 36px 0 44px; padding-top: 28px; border-top: 1px solid var(--border); max-width: 580px; }
+  .proof-item .proof-num { font-family: 'Fraunces', serif; font-size: 25px; font-weight: 600; color: var(--petrol); line-height: 1; }
+  .proof-item .proof-label { font-size: 10.5px; color: var(--slate); text-transform: uppercase; letter-spacing: 0.6px; margin-top: 8px; display: block; max-width: 150px; line-height: 1.5; }
 
-  #hero { min-height: 100vh; display: flex; align-items: center; padding: 120px 48px 80px; position: relative; overflow: hidden; }
-  .hero-grid { position: absolute; inset: 0; background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 60px 60px; opacity: 0.3; mask-image: radial-gradient(ellipse at 20% 50%, black 30%, transparent 80%); }
-  .hero-content { position: relative; z-index: 2; max-width: 800px; }
-  .hero-tag { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; color: var(--accent); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 32px; }
-  .hero-tag::before { content: ''; width: 24px; height: 1px; background: var(--accent); }
-  .hero-name { font-family: 'Syne', sans-serif; font-size: clamp(52px, 8vw, 96px); font-weight: 800; line-height: 0.95; letter-spacing: -3px; margin-bottom: 24px; }
-  .hero-name .line2 { color: transparent; -webkit-text-stroke: 1px var(--muted); }
-  .hero-name .accent { color: var(--accent); }
-  .hero-desc { font-size: 14px; line-height: 1.8; color: var(--muted2); max-width: 520px; margin-bottom: 48px; }
-  .hero-desc strong { color: var(--text); }
+  .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 15px 30px; background: var(--petrol); color: var(--bg); text-decoration: none; font-size: 12.5px; font-weight: 600; letter-spacing: 0.3px; transition: 0.25s ease; border: 1px solid var(--petrol); }
+  .btn-primary:hover { background: var(--petrol-dark); border-color: var(--petrol-dark); transform: translateY(-1px); }
+  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; padding: 15px 30px; border: 1px solid var(--border2); color: var(--graphite); text-decoration: none; font-size: 12.5px; font-weight: 600; transition: 0.25s ease; }
+  .btn-secondary:hover { border-color: var(--petrol); color: var(--petrol); }
 
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; background: var(--accent); color: #000; text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; transition: 0.2s; clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px)); }
-  .btn-primary:hover { background: var(--accent2); transform: translateY(-2px); }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border: 1px solid var(--border); color: var(--muted2); text-decoration: none; font-size: 12px; text-transform: uppercase; transition: 0.2s; }
-  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+  section { padding: 110px 48px; }
+  .section-header { display: flex; align-items: baseline; gap: 18px; margin-bottom: 20px; }
+  .section-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--petrol); letter-spacing: 2px; text-transform: uppercase; font-weight: 500; white-space: nowrap; }
+  .section-title { font-family: 'Fraunces', serif; font-size: 34px; font-weight: 600; letter-spacing: -0.5px; }
+  .section-line { flex: 1; height: 1px; background: var(--border); }
+  .section-sub { font-size: 14px; color: var(--slate); margin-bottom: 56px; max-width: 600px; line-height: 1.7; }
 
-  section { padding: 100px 48px; }
-  .section-header { display: flex; align-items: center; gap: 16px; margin-bottom: 64px; }
-  .section-num { font-size: 11px; color: var(--accent); letter-spacing: 3px; }
-  .section-title { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; }
-  .section-line { flex: 1; height: 1px; background: var(--border); max-width: 200px; }
+  /* ---------- FLAGSHIP ---------- */
+  #flagship { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .flagship-card { border: 1px solid var(--border2); background: var(--bg); padding: 56px; }
+  .flagship-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; flex-wrap: wrap; margin-bottom: 28px; }
+  .flagship-title { font-family: 'Fraunces', serif; font-size: 30px; font-weight: 600; letter-spacing: -0.5px; }
+  .flagship-title em { font-style: italic; color: var(--petrol); }
+  .status-badges { display: flex; gap: 10px; flex-wrap: wrap; }
+  .status-badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; padding: 7px 13px; border: 1px solid; display: inline-flex; align-items: center; gap: 7px; font-weight: 500; }
+  .status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+  .status-badge.live { border-color: var(--petrol); color: var(--petrol); }
+  .status-badge.live::before { background: var(--petrol); }
+  .status-badge.local { border-color: var(--bronze); color: var(--bronze); }
+  .status-badge.local::before { background: var(--bronze); }
 
-  .stack-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
-  .stack-item { padding: 20px; border: 1px solid var(--border); background: var(--bg2); transition: 0.2s; position: relative; }
-  .stack-item:hover { border-color: var(--accent); background: var(--bg3); transform: translateY(-2px); }
-  .stack-icon { font-size: 24px; margin-bottom: 12px; }
-  .stack-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
-  .stack-level { font-size: 10px; text-transform: uppercase; }
-  .stack-level.iniciante { color: var(--warn); }
-  .stack-level.intermediario { color: var(--accent); }
+  .flagship-desc { font-size: 15px; line-height: 1.9; color: var(--slate); max-width: 740px; margin-bottom: 40px; }
+  .flagship-desc strong { color: var(--graphite); font-weight: 600; }
 
-  .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 24px; }
-  .project-card { border: 1px solid var(--border); background: var(--bg); padding: 40px; position: relative; transition: 0.3s; }
-  .project-card:hover { border-color: var(--accent); transform: translateY(-4px); }
-  .project-badge { position: absolute; top: 24px; right: 24px; padding: 4px 10px; border: 1px solid var(--accent); font-size: 9px; color: var(--accent); text-transform: uppercase; }
-  .project-badge.dev { border-color: var(--warn); color: var(--warn); }
-  .project-num { font-size: 48px; font-family: 'Syne', sans-serif; font-weight: 800; color: var(--border); margin-bottom: 15px; }
-  .project-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; margin-bottom: 12px; }
-  .project-desc { font-size: 13px; color: var(--muted2); line-height: 1.7; margin-bottom: 24px; }
-  .tag { display: inline-block; padding: 4px 12px; border: 1px solid var(--border); font-size: 10px; color: var(--muted2); margin: 0 4px 8px 0; text-transform: uppercase; }
-  .tag.highlight { border-color: var(--accent); color: var(--accent); }
+  .flagship-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; }
+
+  .arch-list { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+  .arch-list li { display: flex; gap: 12px; font-size: 13px; color: var(--slate); line-height: 1.65; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+  .arch-list li:last-child { border-bottom: none; }
+  .arch-list .arch-icon { color: var(--petrol); flex-shrink: 0; font-weight: 600; }
+  .arch-list strong { color: var(--graphite); font-weight: 600; }
+
+  .pipeline-box { border: 1px solid var(--border); padding: 26px; background: var(--surface); }
+  .pipeline-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--slate); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 18px; display: flex; justify-content: space-between; }
+  .sprint-row { display: flex; align-items: center; gap: 10px; font-size: 12px; padding: 6px 0; color: var(--slate); }
+  .sprint-row .dot { width: 15px; height: 15px; border-radius: 3px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 9px; font-family: 'JetBrains Mono', monospace; }
+  .sprint-row.done .dot { background: rgba(23,73,74,0.08); color: var(--petrol); border: 1px solid var(--petrol); }
+  .sprint-row.done .name { color: var(--graphite); }
+  .sprint-row.pending .dot { background: transparent; border: 1px dashed var(--slate-light); color: var(--slate-light); }
+  .pipeline-note { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--bronze); line-height: 1.7; }
+
+  .flagship-stack { display: flex; flex-wrap: wrap; gap: 8px; margin: 32px 0; }
+  .flagship-cta { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+  .flagship-cta-note { font-size: 12px; color: var(--slate-light); max-width: 340px; line-height: 1.6; }
+
+  /* ---------- STACK ---------- */
+  .stack-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); gap: 12px; }
+  .stack-item { padding: 22px; border: 1px solid var(--border); background: var(--bg); transition: 0.25s ease; }
+  .stack-item:hover { border-color: var(--petrol); transform: translateY(-2px); }
+  .stack-icon { font-size: 22px; margin-bottom: 14px; }
+  .stack-name { font-size: 13.5px; font-weight: 600; margin-bottom: 5px; }
+  .stack-level { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .stack-level.aprendendo { color: var(--bordeaux); }
+  .stack-level.solida { color: var(--petrol); }
+  .stack-level.evolucao { color: var(--bronze); }
+
+  .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 24px; }
+  .project-card { border: 1px solid var(--border); background: var(--bg); padding: 40px; position: relative; transition: 0.3s ease; }
+  .project-card:hover { border-color: var(--petrol); transform: translateY(-3px); }
+  .project-badge { position: absolute; top: 24px; right: 24px; padding: 5px 11px; border: 1px solid var(--petrol); font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--petrol); text-transform: uppercase; letter-spacing: 0.5px; }
+  .project-num { font-family: 'Fraunces', serif; font-size: 42px; font-weight: 600; color: var(--border2); margin-bottom: 12px; }
+  .project-title { font-family: 'Fraunces', serif; font-size: 21px; font-weight: 600; margin-bottom: 12px; }
+  .project-desc { font-size: 13.5px; color: var(--slate); line-height: 1.7; margin-bottom: 24px; }
+  .tag { display: inline-block; padding: 4px 12px; border: 1px solid var(--border); font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--slate); margin: 0 4px 8px 0; text-transform: uppercase; }
+  .tag.highlight { border-color: var(--petrol); color: var(--petrol); }
   .project-links { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
-  .project-link { color: var(--accent); text-decoration: none; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; }
-  .project-link:hover { color: var(--accent2); }
-  .project-link.live { color: var(--warn); }
-  .project-link.live:hover { color: #cc8800; }
+  .project-link { color: var(--petrol); text-decoration: none; font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 600; transition: 0.2s; }
+  .project-link:hover { color: var(--petrol-dark); }
+  .project-link.live { color: var(--bronze); }
+  .project-link.live:hover { color: #6e4720; }
 
-  .about-grid { display: grid; grid-template-columns: 280px 1fr 1fr; gap: 48px; }
-  .about-photo { border: 1px solid var(--border); padding: 10px; background: var(--bg2); }
-  .about-photo img { width: 100%; filter: grayscale(100%); transition: 0.3s; }
+  .about-grid { display: grid; grid-template-columns: 260px 1fr 1fr; gap: 48px; }
+  .about-photo { border: 1px solid var(--border); padding: 10px; background: var(--surface); align-self: start; }
+  .about-photo img { width: 100%; display: block; filter: grayscale(45%) contrast(1.02); transition: 0.3s; }
   .about-photo:hover img { filter: grayscale(0%); }
-  .about-text p { font-size: 14px; color: var(--muted2); line-height: 1.9; margin-bottom: 16px; }
-  .about-text strong { color: var(--accent); }
+  .about-text p { font-size: 14.5px; color: var(--slate); line-height: 1.9; margin-bottom: 16px; }
+  .about-text strong { color: var(--petrol); font-weight: 600; }
 
-  .skill-row { margin-bottom: 20px; }
-  .skill-header { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px; }
-  .skill-bar { height: 2px; background: var(--border); }
-  .skill-fill { height: 100%; background: var(--accent); width: 0; transition: width 1.5s ease; }
+  .traits-list { list-style: none; display: flex; flex-direction: column; gap: 18px; }
+  .traits-list li { font-size: 13.5px; color: var(--slate); line-height: 1.7; padding-left: 20px; position: relative; }
+  .traits-list li::before { content: '—'; position: absolute; left: 0; color: var(--petrol); font-weight: 600; }
+  .traits-list strong { color: var(--graphite); font-weight: 600; }
 
-  .contact-title { font-family: 'Syne', sans-serif; font-size: clamp(40px, 6vw, 72px); font-weight: 800; text-align: center; margin-bottom: 40px; }
-  .contact-title span { color: transparent; -webkit-text-stroke: 1px var(--muted); }
-  .contact-links { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+  #contact { text-align: center; }
+  .contact-title { font-family: 'Fraunces', serif; font-size: clamp(38px, 5vw, 60px); font-weight: 600; margin-bottom: 22px; letter-spacing: -1px; }
+  .contact-title em { font-style: italic; color: var(--petrol); }
+  .contact-sub { font-size: 14px; color: var(--slate); max-width: 480px; margin: 0 auto 40px; line-height: 1.8; }
+  .contact-links { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; }
 
-  .reveal { opacity: 0; transform: translateY(30px); transition: 0.8s ease-out; }
+  .reveal { opacity: 0; transform: translateY(14px); transition: 0.7s cubic-bezier(0.16,1,0.3,1); }
   .reveal.visible { opacity: 1; transform: translateY(0); }
 
-  @media (max-width: 900px) {
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    html { scroll-behavior: auto; }
+  }
+
+  @media (max-width: 1000px) {
+    .flagship-grid { grid-template-columns: 1fr; }
     .about-grid { grid-template-columns: 1fr; }
+    .about-photo { max-width: 220px; }
+  }
+  @media (max-width: 900px) {
     .projects-grid { grid-template-columns: 1fr; }
-    nav { padding: 20px; }
+    section { padding: 76px 24px; }
+    .flagship-card { padding: 32px 24px; }
+    nav { padding: 18px 20px; }
     .nav-links { display: none; }
+    .section-header { flex-wrap: wrap; }
   }
 </style>
 </head>
 <body>
 
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursorRing"></div>
-
 <nav>
-  <div class="nav-logo">WR<span>.dev</span></div>
+  <div class="nav-logo">Wellington<span> Roveder</span></div>
   <ul class="nav-links">
+    <li><a href="#flagship">FechaBot</a></li>
     <li><a href="#stack">Stack</a></li>
     <li><a href="#projects">Projetos</a></li>
     <li><a href="#about">Sobre</a></li>
@@ -147,55 +197,156 @@
 </nav>
 
 <section id="hero">
-  <div class="hero-grid"></div>
   <div class="hero-content">
-    <div class="hero-tag">Disponível para Estágio / Júnior</div>
+    <div class="hero-tag">Disponível para estágio / júnior — backend</div>
     <h1 class="hero-name">
-      Wellington<br><span class="line2">Danilo</span><br><span class="accent">Roveder_</span>
+      Wellington Danilo<br><em>Roveder.</em>
     </h1>
     <p class="hero-desc">
-      Desenvolvedor Python focado em <strong>automação de processos e engenharia de dados</strong>. 
-      Utilizo 10 anos de experiência operacional para transformar fluxos manuais complexos em sistemas eficientes e escaláveis.
+      Desenvolvedor Python focado em <strong>automação de processos e backend de dados</strong>.
+      Construí uma solução que já roda em produção reduzindo um fechamento operacional de
+      <strong>20 minutos para 30 segundos</strong> — e agora estou evoluindo ela para um SaaS
+      multi-tenant com IA integrada.
     </p>
+    <div class="hero-proof">
+      <div class="proof-item">
+        <div class="proof-num">20min → 30s</div>
+        <span class="proof-label">Tempo de fechamento reduzido em produção real</span>
+      </div>
+      <div class="proof-item">
+        <div class="proof-num">10 sprints</div>
+        <span class="proof-label">Entregues de forma incremental no FechaBot SaaS</span>
+      </div>
+      <div class="proof-item">
+        <div class="proof-num">10 anos</div>
+        <span class="proof-label">De gestão operacional sob pressão real</span>
+      </div>
+    </div>
     <div style="display:flex; gap:16px; flex-wrap:wrap;">
-      <a href="#projects" class="btn-primary">→ Ver Projetos</a>
+      <a href="#flagship" class="btn-primary">Ver o FechaBot →</a>
       <a href="https://github.com/Wellington-Roveder" target="_blank" class="btn-secondary">GitHub ↗</a>
+    </div>
+  </div>
+</section>
+
+<section id="flagship">
+  <div class="section-header reveal">
+    <span class="section-eyebrow">Projeto principal</span>
+    <div class="section-line"></div>
+  </div>
+  <h2 class="section-title reveal" style="margin-bottom: 16px;">FechaBot</h2>
+  <p class="section-sub reveal">Da dor real de um negócio até uma arquitetura pensada pra escalar. Este é o projeto que melhor mostra como eu penso e entrego.</p>
+
+  <div class="flagship-card reveal">
+    <div class="flagship-top">
+      <h3 class="flagship-title">Fecha<em>Bot</em></h3>
+      <div class="status-badges">
+        <span class="status-badge live">MVP em produção</span>
+        <span class="status-badge local">SaaS em validação final (local)</span>
+      </div>
+    </div>
+
+    <p class="flagship-desc">
+      O FechaBot nasceu resolvendo um problema concreto: uma loja fechava o caixa manualmente
+      todo dia, cruzando planilhas do PDV. O <strong>MVP em Python + Pandas</strong> automatizou
+      isso e está em uso real na Pollo Loko (SJC), cortando o fechamento de <strong>20 minutos
+      para cerca de 30 segundos</strong>.
+      A partir dessa validação, comecei a construir a versão <strong>SaaS multi-tenant</strong>:
+      qualquer negócio configura seus próprios filtros e template de mensagem, faz upload da
+      planilha e recebe o resumo pronto no WhatsApp — com um histórico consultável por IA em
+      linguagem natural, como um cientista de dados de bolso.
+    </p>
+
+    <div class="flagship-grid">
+      <div>
+        <ul class="arch-list">
+          <li><span class="arch-icon">—</span><span><strong>Multi-tenant desde o schema</strong> — todo dado isolado por tenant_id, sem exceção, do banco ao JWT.</span></li>
+          <li><span class="arch-icon">—</span><span><strong>Fila assíncrona com Celery + Redis</strong> — nenhum envio ao WhatsApp acontece de forma síncrona.</span></li>
+          <li><span class="arch-icon">—</span><span><strong>IA analista via Claude API</strong> — chat que responde sobre o histórico do próprio negócio, contexto sempre isolado por tenant.</span></li>
+          <li><span class="arch-icon">—</span><span><strong>Camada de segurança dedicada</strong> — rate limiting por IP e por tenant, headers de segurança, segredos como SecretStr, sanitização contra path traversal.</span></li>
+          <li><span class="arch-icon">—</span><span><strong>Histórico persistido</strong> — resultados calculados no Postgres, planilha original preservada no Cloudflare R2.</span></li>
+        </ul>
+
+        <div class="flagship-stack">
+          <span class="tag highlight">FastAPI</span>
+          <span class="tag highlight">Next.js</span>
+          <span class="tag highlight">PostgreSQL</span>
+          <span class="tag highlight">Redis / Celery</span>
+          <span class="tag highlight">Claude API</span>
+          <span class="tag">Docker</span>
+          <span class="tag">Cloudflare R2</span>
+          <span class="tag">JWT / bcrypt</span>
+          <span class="tag">Meta Cloud API</span>
+        </div>
+      </div>
+
+      <div class="pipeline-box">
+        <div class="pipeline-label"><span>Pipeline de sprints</span><span>10/11 concluídos</span></div>
+
+        <div class="sprint-row done"><div class="dot">✓</div><span class="name">01 — Fundação multi-tenant do banco</span></div>
+        <div class="sprint-row done"><div class="dot">✓</div><span class="name">02 — Leitor de planilha dinâmico</span></div>
+        <div class="sprint-row done"><div class="dot">✓</div><span class="name">03 — Autenticação JWT</span></div>
+        <div class="sprint-row done"><div class="dot">✓</div><span class="name">04 — WhatsApp + fila Celery</span></div>
+        <div class="sprint-row done"><div class="dot">✓</div><span class="name">05 — Pipeline completo + CRUD</span></div>
+        <div class="sprint-row done"><div class="dot">✓</div><span class="name">06 — Frontend MVP (Next.js)</span></div>
+        <div class="sprint-row done"><div class="dot">✓</div><span class="name">07 — Integração ponta a ponta</span></div>
+        <div class="sprint-row done"><div class="dot">✓</div><span class="name">08 — Melhorias pós-MVP</span></div>
+        <div class="sprint-row done"><div class="dot">✓</div><span class="name">09 — IA integrada (Claude API)</span></div>
+        <div class="sprint-row done"><div class="dot">✓</div><span class="name">10 — Segurança (rate limit, headers, secrets)</span></div>
+        <div class="sprint-row pending"><div class="dot"></div><span class="name">11 — Cobrança, deploy e onboarding</span></div>
+
+        <div class="pipeline-note">
+          Ainda não testei o envio real de WhatsApp nem o chat de IA ponta a ponta em conjunto —
+          por isso o código está local, sem commit público. Assim que validar os dois, subo a
+          versão mais estável e libero para recrutadores testarem e verem uma demo em vídeo.
+        </div>
+      </div>
+    </div>
+
+    <div class="flagship-cta">
+      <a href="https://github.com/Wellington-Roveder/FechaBot-MVP" target="_blank" class="btn-primary">Ver o MVP no GitHub →</a>
+      <span class="btn-secondary" style="opacity:0.5; cursor:default; pointer-events:none;" aria-disabled="true" title="Disponível assim que o SaaS for validado">Ver o FechaBot SaaS (em breve)</span>
+      <a href="mailto:rovederwellington@gmail.com?subject=FechaBot%20-%20quero%20ver%20uma%20demo" class="btn-secondary">Pedir demo por email</a>
+      <span class="flagship-cta-note">O MVP tem código aberto. O link do SaaS entra aqui assim que a validação terminar.</span>
     </div>
   </div>
 </section>
 
 <section id="stack">
   <div class="section-header reveal">
-    <span class="section-num">01</span>
-    <h2 class="section-title">Stack Técnica</h2>
+    <span class="section-eyebrow">Ferramentas</span>
     <div class="section-line"></div>
   </div>
+  <h2 class="section-title reveal" style="margin-bottom: 16px;">Stack Técnica</h2>
+  <p class="section-sub reveal">Sem porcentagem inventada. Cada nível reflete onde a tecnologia foi realmente usada.</p>
   <div class="stack-grid reveal">
-    <div class="stack-item"><div class="stack-icon">🐍</div><div class="stack-name">Python</div><div class="stack-level intermediario">Intermediário</div></div>
-    <div class="stack-item"><div class="stack-icon">⚡</div><div class="stack-name">FastAPI</div><div class="stack-level intermediario">Intermediário</div></div>
-    <div class="stack-item"><div class="stack-icon">🎸</div><div class="stack-name">Django</div><div class="stack-level intermediario">Em Evolução</div></div>
-    <div class="stack-item"><div class="stack-icon">🔄</div><div class="stack-name">n8n / Automate</div><div class="stack-level intermediario">Intermediário</div></div>
-    <div class="stack-item"><div class="stack-icon">🐳</div><div class="stack-name">Docker</div><div class="stack-level iniciante">Iniciante</div></div>
-    <div class="stack-item"><div class="stack-icon">🐙</div><div class="stack-name">Git / GitHub</div><div class="stack-level intermediario">Aperfeiçoando</div></div>
-    <div class="stack-item"><div class="stack-icon">📊</div><div class="stack-name">Pandas / ETL</div><div class="stack-level intermediario">Intermediário</div></div>
-    <div class="stack-item"><div class="stack-icon">🐘</div><div class="stack-name">PostgreSQL / SQL</div><div class="stack-level intermediario">Intermediário</div></div>
+    <div class="stack-item"><div class="stack-icon">🐍</div><div class="stack-name">Python</div><div class="stack-level solida">Base sólida</div></div>
+    <div class="stack-item"><div class="stack-icon">⚡</div><div class="stack-name">FastAPI</div><div class="stack-level solida">Base sólida</div></div>
+    <div class="stack-item"><div class="stack-icon">📊</div><div class="stack-name">Pandas / ETL</div><div class="stack-level solida">Base sólida</div></div>
+    <div class="stack-item"><div class="stack-icon">🐘</div><div class="stack-name">PostgreSQL / SQL</div><div class="stack-level solida">Base sólida</div></div>
+    <div class="stack-item"><div class="stack-icon">🔄</div><div class="stack-name">n8n / Automação</div><div class="stack-level solida">Base sólida</div></div>
+    <div class="stack-item"><div class="stack-icon">⚛️</div><div class="stack-name">Next.js / React</div><div class="stack-level evolucao">Em evolução</div></div>
+    <div class="stack-item"><div class="stack-icon">🧵</div><div class="stack-name">Redis / Celery</div><div class="stack-level evolucao">Em evolução</div></div>
+    <div class="stack-item"><div class="stack-icon">🐳</div><div class="stack-name">Docker</div><div class="stack-level evolucao">Em evolução</div></div>
+    <div class="stack-item"><div class="stack-icon">🤖</div><div class="stack-name">Claude API / IA</div><div class="stack-level evolucao">Em evolução</div></div>
+    <div class="stack-item"><div class="stack-icon">🐙</div><div class="stack-name">Git / GitHub</div><div class="stack-level evolucao">Em evolução</div></div>
+    <div class="stack-item"><div class="stack-icon">🎸</div><div class="stack-name">Django</div><div class="stack-level aprendendo">Primeiro contato</div></div>
   </div>
 </section>
 
 <section id="projects">
   <div class="section-header reveal">
-    <span class="section-num">02</span>
-    <h2 class="section-title">Projetos</h2>
+    <span class="section-eyebrow">Portfólio</span>
     <div class="section-line"></div>
   </div>
+  <h2 class="section-title reveal" style="margin-bottom: 56px;">Outros Projetos</h2>
   <div class="projects-grid">
 
-    <!-- PROJETO 01 -->
     <div class="project-card reveal">
       <div class="project-badge">Em Produção</div>
       <div class="project-num">01</div>
       <h3 class="project-title">FechaBot MVP</h3>
-      <p class="project-desc">Solução real de automação comercial implantada na Pollo Loko (SJC). Reduziu o fechamento de caixa de 20 min para 30 segundos — lê planilha PDV, processa com Pandas e gera relatório pronto para WhatsApp como .exe portátil.</p>
+      <p class="project-desc">A versão que validou tudo. Solução de automação comercial implantada na Pollo Loko (SJC): lê a planilha do PDV, processa com Pandas e gera o relatório pronto pro WhatsApp como executável portátil. Reduziu o fechamento de caixa de 20 min para 30 segundos.</p>
       <div class="project-tags" style="margin-bottom:20px;">
         <span class="tag highlight">Python</span><span class="tag highlight">Pandas</span><span class="tag">Tkinter</span><span class="tag">PyInstaller</span>
       </div>
@@ -204,7 +355,6 @@
       </div>
     </div>
 
-    <!-- PROJETO 02 -->
     <div class="project-card reveal">
       <div class="project-badge">Em Produção</div>
       <div class="project-num">02</div>
@@ -219,11 +369,10 @@
       </div>
     </div>
 
-    <!-- PROJETO 03 -->
     <div class="project-card reveal">
       <div class="project-num">03</div>
       <h3 class="project-title">SentinelLog</h3>
-      <p class="project-desc">Pipeline ETL que monitora preços de jogos via API REST, persiste histórico em SQLite e detecta variações automaticamente. FastAPI expõe endpoint consumido pelo N8N para alertas por email, com dashboard interativo em Streamlit.</p>
+      <p class="project-desc">Pipeline ETL que monitora preços de jogos via API REST, persiste histórico em SQLite e detecta variações automaticamente. FastAPI expõe endpoint consumido pelo n8n para alertas por email, com dashboard interativo em Streamlit.</p>
       <div class="project-tags" style="margin-bottom:20px;">
         <span class="tag highlight">FastAPI</span><span class="tag highlight">n8n</span><span class="tag">SQLite</span><span class="tag">Streamlit</span>
       </div>
@@ -232,92 +381,65 @@
       </div>
     </div>
 
-    <!-- PROJETO 04 -->
-    <div class="project-card reveal">
-      <div class="project-badge dev">Em Desenvolvimento</div>
-      <div class="project-num">04</div>
-      <h3 class="project-title">FechaBot SaaS</h3>
-      <p class="project-desc">Evolução do MVP para a nuvem. Arquitetura multi-tenant com envio automático via WhatsApp, suporte a múltiplas lojas e dashboard centralizado — sem interação manual do usuário.</p>
-      <div class="project-tags" style="margin-bottom:20px;">
-        <span class="tag highlight">Django</span><span class="tag highlight">PostgreSQL</span><span class="tag">Docker</span><span class="tag">Redis</span>
-      </div>
-    </div>
-
   </div>
 </section>
 
 <section id="about">
   <div class="section-header reveal">
-    <span class="section-num">03</span>
-    <h2 class="section-title">Sobre Mim</h2>
+    <span class="section-eyebrow">Perfil</span>
     <div class="section-line"></div>
   </div>
+  <h2 class="section-title reveal" style="margin-bottom: 56px;">Sobre Mim</h2>
   <div class="about-grid">
     <div class="about-photo reveal">
       <img src="eu_profissional.png" alt="Wellington Roveder">
     </div>
     <div class="about-text reveal">
-      <p>Sou estudante de <strong>Ciência da Computação</strong> e atualmente Gerente de Plantão no McDonald's (há 10 anos).</p>
-      <p>Gerenciar operações de alto volume me ensinou a ter <strong>foco absoluto em resultados</strong> e a construir sistemas que não falham sob pressão. Trago essa mentalidade "pé no chão" para o desenvolvimento de software.</p>
-      <p>Meu objetivo é consolidar minha transição para o backend, criando automações que gerem valor real para empresas e usuários.</p>
+      <p>Sou estudante de <strong>Ciência da Computação</strong> e atualmente Gerente de Plantão no McDonald's, onde estou há 10 anos.</p>
+      <p>Gerenciar operação de alto volume me ensinou a ter <strong>foco em resultado</strong> e a lidar com sistemas que não podem falhar sob pressão — inventário, gente, prazo, tudo ao mesmo tempo. É essa mentalidade que trago pro código: entregar em sprints pequenos, documentar decisões, e não subir nada pra produção sem testar de verdade.</p>
+      <p>Meu objetivo agora é minha primeira posição formal como desenvolvedor backend, aplicando isso em um time.</p>
     </div>
-    <div class="skills-list reveal">
-      <div class="skill-row">
-        <div class="skill-header"><span>Liderança e Processos</span><span>95%</span></div>
-        <div class="skill-bar"><div class="skill-fill" data-width="95"></div></div>
-      </div>
-      <div class="skill-row">
-        <div class="skill-header"><span>Python / Automação</span><span>85%</span></div>
-        <div class="skill-bar"><div class="skill-fill" data-width="85"></div></div>
-      </div>
-      <div class="skill-row">
-        <div class="skill-header"><span>Resolução de Problemas</span><span>90%</span></div>
-        <div class="skill-bar"><div class="skill-fill" data-width="90"></div></div>
-      </div>
-    </div>
+    <ul class="traits-list reveal">
+      <li><strong>Entrega incremental</strong> — o FechaBot SaaS foi construído e documentado sprint a sprint, com rollback claro em cada etapa.</li>
+      <li><strong>Não finjo que terminou</strong> — se algo não foi testado ponta a ponta, eu falo isso antes de alguém perguntar.</li>
+      <li><strong>Automação com propósito</strong> — meu ponto de partida sempre é o problema real de quem usa, não a tecnologia em si.</li>
+      <li><strong>Operação sob pressão</strong> — 10 anos gerenciando turno de loja de alto volume, todo dia.</li>
+    </ul>
   </div>
 </section>
 
 <section id="contact">
-  <h2 class="contact-title reveal">Vamos <span>conversar?</span></h2>
+  <h2 class="contact-title reveal">Vamos <em>conversar?</em></h2>
+  <p class="contact-sub reveal">Aberto a vagas de estágio ou júnior em backend. Se você é dono de negócio e quer ver o FechaBot rodando, também me chama — te mostro uma demo.</p>
   <div class="contact-links reveal">
-    <a href="mailto:rovederwellington@gmail.com" class="btn-primary">✉ Email</a>
+    <a href="mailto:rovederwellington@gmail.com" class="btn-primary">Email</a>
     <a href="https://www.linkedin.com/in/wellington-roveder-04637b37b/" target="_blank" class="btn-secondary">LinkedIn</a>
+    <a href="https://github.com/Wellington-Roveder" target="_blank" class="btn-secondary">GitHub</a>
   </div>
+  <p class="reveal" style="margin-top: 22px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--slate);">
+    <a href="mailto:rovederwellington@gmail.com" style="text-decoration: underline; text-underline-offset: 3px;">rovederwellington@gmail.com</a>
+  </p>
 </section>
 
-<footer style="padding: 48px; text-align: center; font-size: 11px; color: var(--muted); border-top: 1px solid var(--border);">
+<footer style="padding: 48px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--slate-light); border-top: 1px solid var(--border);">
   © 2026 Wellington Roveder • Construído com Python & Criatividade.
 </footer>
 
 <script>
-  const cursor = document.getElementById('cursor');
-  const ring = document.getElementById('cursorRing');
-  let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
-
-  document.addEventListener('mousemove', e => {
-    mouseX = e.clientX; mouseY = e.clientY;
-    cursor.style.left = mouseX - 4 + 'px'; cursor.style.top = mouseY - 4 + 'px';
-  });
-
-  function animateRing() {
-    ringX += (mouseX - ringX) * 0.15; ringY += (mouseY - ringY) * 0.15;
-    ring.style.left = ringX - 16 + 'px'; ring.style.top = ringY - 16 + 'px';
-    requestAnimationFrame(animateRing);
-  }
-  animateRing();
-
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add('visible');
-        const fills = entry.target.querySelectorAll('.skill-fill');
-        fills.forEach(f => f.style.width = f.dataset.width + '%');
       }
     });
-  }, { threshold: 0.2 });
+  }, { threshold: 0.15 });
 
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  if (!reduceMotion) {
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  } else {
+    document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+  }
 </script>
 
 </body>
