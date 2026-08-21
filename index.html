@@ -128,6 +128,13 @@
   .stack-level.solida { color: var(--petrol); }
   .stack-level.evolucao { color: var(--bronze); }
 
+  .stack-legend { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 24px; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--slate); text-transform: uppercase; letter-spacing: 0.4px; }
+  .stack-legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .stack-legend .dot { width: 7px; height: 7px; border-radius: 50%; }
+  .stack-legend .dot.avancado { background: var(--petrol); }
+  .stack-legend .dot.intermediario { background: var(--bronze); }
+  .stack-legend .dot.basico { background: var(--bordeaux); }
+
   .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 24px; }
   .project-card { border: 1px solid var(--border); background: var(--bg); padding: 40px; position: relative; transition: 0.3s ease; }
   .project-card:hover { border-color: var(--petrol); transform: translateY(-3px); }
@@ -304,10 +311,10 @@
     </div>
 
     <div class="flagship-cta">
-      <a href="https://github.com/Wellington-Roveder/FechaBot-MVP" target="_blank" class="btn-primary">Ver o MVP no GitHub →</a>
-      <span class="btn-secondary" style="opacity:0.5; cursor:default; pointer-events:none;" aria-disabled="true" title="Disponível assim que o SaaS for validado">Ver o FechaBot SaaS (em breve)</span>
+      <a href="case-study.html" class="btn-primary">Ver case study técnico →</a>
+      <a href="https://github.com/Wellington-Roveder/FechaBot-MVP" target="_blank" class="btn-secondary">Ver o MVP no GitHub →</a>
       <a href="mailto:rovederwellington@gmail.com?subject=FechaBot%20-%20quero%20ver%20uma%20demo" class="btn-secondary">Pedir demo por email</a>
-      <span class="flagship-cta-note">O MVP tem código aberto. O link do SaaS entra aqui assim que a validação terminar.</span>
+      <span class="flagship-cta-note">O case study documenta arquitetura, segurança e demos em vídeo do SaaS, sem expor o código-fonte.</span>
     </div>
   </div>
 </section>
@@ -318,19 +325,24 @@
     <div class="section-line"></div>
   </div>
   <h2 class="section-title reveal" style="margin-bottom: 16px;">Stack Técnica</h2>
-  <p class="section-sub reveal">Sem porcentagem inventada. Cada nível reflete onde a tecnologia foi realmente usada.</p>
+  <p class="section-sub reveal">Sem porcentagem inventada. Cada nível reflete onde a tecnologia foi realmente usada, em escala de mercado.</p>
+  <div class="stack-legend reveal">
+    <span><span class="dot avancado"></span>Avançado — uso recorrente e autônomo, inclusive em produção</span>
+    <span><span class="dot intermediario"></span>Intermediário — já entreguei funcionalidades reais, ainda consolidando</span>
+    <span><span class="dot basico"></span>Básico — primeiro contato, em estudo ativo</span>
+  </div>
   <div class="stack-grid reveal">
-    <div class="stack-item"><div class="stack-icon">🐍</div><div class="stack-name">Python</div><div class="stack-level solida">Base sólida</div></div>
-    <div class="stack-item"><div class="stack-icon">⚡</div><div class="stack-name">FastAPI</div><div class="stack-level solida">Base sólida</div></div>
-    <div class="stack-item"><div class="stack-icon">📊</div><div class="stack-name">Pandas / ETL</div><div class="stack-level solida">Base sólida</div></div>
-    <div class="stack-item"><div class="stack-icon">🐘</div><div class="stack-name">PostgreSQL / SQL</div><div class="stack-level solida">Base sólida</div></div>
-    <div class="stack-item"><div class="stack-icon">🔄</div><div class="stack-name">n8n / Automação</div><div class="stack-level solida">Base sólida</div></div>
-    <div class="stack-item"><div class="stack-icon">⚛️</div><div class="stack-name">Next.js / React</div><div class="stack-level evolucao">Em evolução</div></div>
-    <div class="stack-item"><div class="stack-icon">🧵</div><div class="stack-name">Redis / Celery</div><div class="stack-level evolucao">Em evolução</div></div>
-    <div class="stack-item"><div class="stack-icon">🐳</div><div class="stack-name">Docker</div><div class="stack-level evolucao">Em evolução</div></div>
-    <div class="stack-item"><div class="stack-icon">🤖</div><div class="stack-name">Claude API / IA</div><div class="stack-level evolucao">Em evolução</div></div>
-    <div class="stack-item"><div class="stack-icon">🐙</div><div class="stack-name">Git / GitHub</div><div class="stack-level evolucao">Em evolução</div></div>
-    <div class="stack-item"><div class="stack-icon">🎸</div><div class="stack-name">Django</div><div class="stack-level aprendendo">Primeiro contato</div></div>
+    <div class="stack-item"><div class="stack-icon">🐍</div><div class="stack-name">Python</div><div class="stack-level solida">Avançado</div></div>
+    <div class="stack-item"><div class="stack-icon">⚡</div><div class="stack-name">FastAPI</div><div class="stack-level solida">Avançado</div></div>
+    <div class="stack-item"><div class="stack-icon">📊</div><div class="stack-name">Pandas / ETL</div><div class="stack-level solida">Avançado</div></div>
+    <div class="stack-item"><div class="stack-icon">🐘</div><div class="stack-name">PostgreSQL / SQL</div><div class="stack-level solida">Avançado</div></div>
+    <div class="stack-item"><div class="stack-icon">🔄</div><div class="stack-name">n8n / Automação</div><div class="stack-level solida">Avançado</div></div>
+    <div class="stack-item"><div class="stack-icon">⚛️</div><div class="stack-name">Next.js / React</div><div class="stack-level evolucao">Intermediário</div></div>
+    <div class="stack-item"><div class="stack-icon">🧵</div><div class="stack-name">Redis / Celery</div><div class="stack-level evolucao">Intermediário</div></div>
+    <div class="stack-item"><div class="stack-icon">🐳</div><div class="stack-name">Docker</div><div class="stack-level evolucao">Intermediário</div></div>
+    <div class="stack-item"><div class="stack-icon">🤖</div><div class="stack-name">Claude API / IA</div><div class="stack-level evolucao">Intermediário</div></div>
+    <div class="stack-item"><div class="stack-icon">🐙</div><div class="stack-name">Git / GitHub</div><div class="stack-level evolucao">Intermediário</div></div>
+    <div class="stack-item"><div class="stack-icon">🎸</div><div class="stack-name">Django</div><div class="stack-level aprendendo">Básico</div></div>
   </div>
 </section>
 
