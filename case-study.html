@@ -183,6 +183,7 @@
   <ul class="nav-links">
     <li><a href="#problem">Problema</a></li>
     <li><a href="#highlights">Destaques</a></li>
+    <li><a href="#ci">CI/CD</a></li>
     <li><a href="#demo">Demo</a></li>
     <li><a href="#roadmap">Maturidade</a></li>
   </ul>
@@ -382,6 +383,47 @@
     <p class="demo-desc">Template aprovado pela Meta, pipeline completo validado ponta a ponta — da planilha até a mensagem chegando de fato no WhatsApp.</p>
     <div class="demo-media"><img src="https://raw.githubusercontent.com/Wellington-Roveder/fechabot-case-study/main/media/screenshots/whatsapp_delivery_confirmation.png" alt="Mensagens entregues no WhatsApp" loading="lazy"></div>
     <p class="demo-caption">Números de telefone e dados de destinatário são valores de teste — nunca dado real de cliente.</p>
+  </div>
+</section>
+
+<section id="ci">
+  <div class="section-header reveal">
+    <span class="section-eyebrow">Engenharia de verdade</span>
+    <div class="section-line"></div>
+  </div>
+  <h2 class="section-title reveal" style="margin-bottom: 16px;">CI/CD e disciplina de testes</h2>
+  <p class="section-sub reveal">Todo push passa por um pipeline automatizado antes de ir pra branch principal — lint, aplicação de schema de banco e suíte de testes com cobertura mínima travada.</p>
+
+  <div class="maturity-grid">
+    <div class="maturity-card reveal">
+      <div class="maturity-num">66</div>
+      <div class="maturity-label">Testes automatizados rodando a cada push — cobrindo webhook, filtros, processamento, serviços e armazenamento</div>
+    </div>
+    <div class="maturity-card reveal">
+      <div class="maturity-num">46,9%</div>
+      <div class="maturity-label">Cobertura de código atual, subindo sprint a sprint — piso travado em 40% no pipeline (build quebra abaixo disso)</div>
+    </div>
+    <div class="maturity-card reveal">
+      <div class="maturity-num">21</div>
+      <div class="maturity-label">Execuções de workflow no GitHub Actions até agora, incluindo falhas reais corrigidas antes do merge</div>
+    </div>
+  </div>
+
+  <div class="highlight-list">
+    <div class="highlight-item reveal">
+      <span class="highlight-tag">Pipeline</span>
+      <div>
+        <h3 class="highlight-title">Gate de qualidade, não só "rodou"</h3>
+        <p class="highlight-desc">O pipeline aplica o schema do banco, roda lint (<code>ruff</code>) e só então executa a suíte com <code>pytest --cov</code>. Se a cobertura cair abaixo de 40%, o build quebra — a régua sobe aos poucos, junto com os testes novos, em vez de perseguir um número bonito sem substância.</p>
+      </div>
+    </div>
+    <div class="highlight-item reveal">
+      <span class="highlight-tag">Processo</span>
+      <div>
+        <h3 class="highlight-title">Falha faz parte do processo, documentada</h3>
+        <p class="highlight-desc">O histórico de execuções mostra PRs que quebraram o CI e foram corrigidos antes do merge — como o webhook retornando 500 em vez de 400 para payload malformado, pego pelo próprio pipeline antes de chegar em produção.</p>
+      </div>
+    </div>
   </div>
 </section>
 
