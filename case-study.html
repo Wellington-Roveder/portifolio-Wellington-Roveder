@@ -2,520 +2,133 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FechaBot — Case Study Técnico | Wellington Roveder</title>
-<meta name="description" content="Case study técnico do FechaBot: arquitetura, decisões de segurança e processo de engenharia — do problema real até um pipeline validado ponta a ponta.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FechaBot | Case study técnico | Wellington Roveder</title>
+<meta name="description" content="Case study do FechaBot: do MVP em uso diário em um restaurante ao SaaS multi-tenant, com arquitetura, decisões e segurança documentadas.">
+<meta name="theme-color" content="#0F172A">
+<meta property="og:type" content="article">
+<meta property="og:title" content="FechaBot | Case study técnico">
+<meta property="og:description" content="Do problema real à arquitetura: MVP em produção e SaaS multi-tenant em desenvolvimento.">
+<meta property="og:image" content="https://wellington-roveder.github.io/portifolio-Wellington-Roveder/foto_portifolio.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230F172A'/%3E%3Ctext x='32' y='42' font-size='28' font-family='sans-serif' font-weight='700' text-anchor='middle' fill='%232DD4BF'%3EWR%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #F7F5F1;
-    --surface: #EEEAE3;
-    --surface2: #E4DFD6;
-    --border: #DAD3C6;
-    --border2: #C9C0AF;
-    --graphite: #23221F;
-    --slate: #6B6E73;
-    --slate-light: #8C8E92;
-    --petrol: #17494A;
-    --petrol-dark: #0F3536;
-    --bronze: #8B5A2B;
-    --bronze-light: #A9744A;
-    --bordeaux: #6E2A38;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body {
-    background: var(--bg);
-    color: var(--graphite);
-    font-family: 'IBM Plex Sans', sans-serif;
-    overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  ::selection { background: var(--petrol); color: var(--bg); }
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--border2); }
-  :focus-visible { outline: 2px solid var(--petrol); outline-offset: 3px; }
-
-  a { color: inherit; }
-  img { max-width: 100%; display: block; }
-
-  nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 22px 48px;
-    display: flex; justify-content: space-between; align-items: center;
-    border-bottom: 1px solid var(--border); background: rgba(247,245,241,0.88); backdrop-filter: blur(10px);
-  }
-  .nav-logo { font-family: 'Fraunces', serif; font-weight: 600; font-size: 19px; color: var(--graphite); letter-spacing: -0.3px; text-decoration: none; }
-  .nav-logo span { color: var(--slate-light); font-weight: 400; }
-  .nav-back { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--slate); text-decoration: none; letter-spacing: 0.4px; transition: color .2s; }
-  .nav-back:hover { color: var(--petrol); }
-  .nav-links { display: flex; gap: 36px; list-style: none; }
-  .nav-links a { color: var(--slate); text-decoration: none; font-size: 11px; letter-spacing: 1.6px; text-transform: uppercase; font-weight: 600; position: relative; padding-bottom: 3px; transition: color 0.25s; }
-  .nav-links a::after { content: ''; position: absolute; left: 0; bottom: 0; width: 0; height: 1px; background: var(--petrol); transition: width 0.3s ease; }
-  .nav-links a:hover { color: var(--petrol); }
-  .nav-links a:hover::after { width: 100%; }
-
-  #hero { min-height: 78vh; display: flex; align-items: center; padding: 150px 48px 70px; position: relative; border-bottom: 1px solid var(--border); }
-  .hero-content { position: relative; z-index: 2; max-width: 820px; }
-  .hero-tag { display: inline-flex; align-items: center; gap: 10px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--petrol); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 30px; font-weight: 500; }
-  .hero-tag::before { content: ''; width: 20px; height: 1px; background: var(--petrol); }
-  .hero-name { font-family: 'Fraunces', serif; font-size: clamp(38px, 5.6vw, 66px); font-weight: 600; line-height: 1.08; letter-spacing: -1.5px; margin-bottom: 26px; color: var(--graphite); }
-  .hero-name em { font-style: italic; font-weight: 500; color: var(--petrol); }
-  .hero-desc { font-size: 15.5px; line-height: 1.85; color: var(--slate); max-width: 620px; margin-bottom: 30px; }
-  .hero-desc strong { color: var(--graphite); font-weight: 600; }
-  .hero-note { display: flex; gap: 12px; align-items: flex-start; padding: 18px 20px; background: var(--surface); border: 1px solid var(--border); max-width: 620px; margin-bottom: 34px; }
-  .hero-note-icon { color: var(--bronze); font-weight: 600; flex-shrink: 0; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
-  .hero-note p { font-size: 12.5px; color: var(--slate); line-height: 1.7; }
-  .hero-note strong { color: var(--graphite); }
-
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 15px 30px; background: var(--petrol); color: var(--bg); text-decoration: none; font-size: 12.5px; font-weight: 600; letter-spacing: 0.3px; transition: 0.25s ease; border: 1px solid var(--petrol); }
-  .btn-primary:hover { background: var(--petrol-dark); border-color: var(--petrol-dark); transform: translateY(-1px); }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; padding: 15px 30px; border: 1px solid var(--border2); color: var(--graphite); text-decoration: none; font-size: 12.5px; font-weight: 600; transition: 0.25s ease; }
-  .btn-secondary:hover { border-color: var(--petrol); color: var(--petrol); }
-
-  section { padding: 100px 48px; }
-  .section-header { display: flex; align-items: baseline; gap: 18px; margin-bottom: 20px; }
-  .section-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--petrol); letter-spacing: 2px; text-transform: uppercase; font-weight: 500; white-space: nowrap; }
-  .section-title { font-family: 'Fraunces', serif; font-size: 32px; font-weight: 600; letter-spacing: -0.5px; }
-  .section-line { flex: 1; height: 1px; background: var(--border); }
-  .section-sub { font-size: 14px; color: var(--slate); margin-bottom: 52px; max-width: 640px; line-height: 1.75; }
-
-  /* ---------- PROBLEM ---------- */
-  #problem { background: var(--surface); border-bottom: 1px solid var(--border); }
-  .problem-text { font-size: 16px; line-height: 1.95; color: var(--slate); max-width: 720px; }
-  .problem-text strong { color: var(--graphite); font-weight: 600; }
-  .problem-text p + p { margin-top: 20px; }
-
-  /* ---------- LAYERS ---------- */
-  .layers-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-  .layer-card { border: 1px solid var(--border); background: var(--bg); padding: 32px; }
-  .layer-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--petrol); letter-spacing: 1px; margin-bottom: 16px; }
-  .layer-title { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 600; margin-bottom: 12px; }
-  .layer-desc { font-size: 13.5px; color: var(--slate); line-height: 1.75; }
-
-  /* ---------- HIGHLIGHTS (ADR-style) ---------- */
-  #highlights { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-  .highlight-list { display: flex; flex-direction: column; }
-  .highlight-item { display: grid; grid-template-columns: 90px 1fr; gap: 32px; padding: 30px 0; border-bottom: 1px solid var(--border); }
-  .highlight-item:last-child { border-bottom: none; }
-  .highlight-tag { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--petrol); text-transform: uppercase; letter-spacing: 0.8px; padding-top: 3px; }
-  .highlight-title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 600; margin-bottom: 8px; }
-  .highlight-desc { font-size: 13.5px; color: var(--slate); line-height: 1.8; max-width: 680px; }
-
-  /* ---------- STRUCTURE ---------- */
-  .structure-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
-  .repo-tree { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 2; color: var(--slate); background: var(--surface); border: 1px solid var(--border); padding: 28px; white-space: pre; overflow-x: auto; }
-  .repo-tree .folder { color: var(--petrol); font-weight: 600; }
-  .repo-tree .comment { color: var(--slate-light); }
-  .structure-note-list { list-style: none; display: flex; flex-direction: column; gap: 16px; }
-  .structure-note-list li { font-size: 13.5px; color: var(--slate); line-height: 1.75; padding-left: 20px; position: relative; }
-  .structure-note-list li::before { content: '—'; position: absolute; left: 0; color: var(--petrol); font-weight: 600; }
-  .structure-note-list strong { color: var(--graphite); font-weight: 600; }
-
-  /* ---------- DEMO ---------- */
-  #demo { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-  .demo-block { margin-bottom: 56px; }
-  .demo-block:last-child { margin-bottom: 0; }
-  .demo-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
-  .demo-title { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 600; }
-  .demo-ref { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--slate-light); text-transform: uppercase; letter-spacing: 0.6px; }
-  .demo-desc { font-size: 13.5px; color: var(--slate); line-height: 1.7; margin-bottom: 18px; max-width: 680px; }
-  .demo-media { border: 1px solid var(--border2); background: var(--bg); overflow: hidden; }
-  .demo-media img { width: 100%; }
-  .demo-caption { font-size: 11.5px; color: var(--slate-light); margin-top: 10px; line-height: 1.6; }
-  .demo-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-
-  /* ---------- ROADMAP / MATURITY ---------- */
-  .maturity-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 40px; }
-  .maturity-card { border: 1px solid var(--border); padding: 26px; background: var(--bg); }
-  .maturity-num { font-family: 'Fraunces', serif; font-size: 36px; font-weight: 600; color: var(--petrol); line-height: 1; margin-bottom: 10px; }
-  .maturity-label { font-size: 12px; color: var(--slate); line-height: 1.6; }
-  .roadmap-cta { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
-
-  /* ---------- STACK STRIP ---------- */
-  .stack-strip { display: flex; flex-wrap: wrap; gap: 8px; }
-  .tag { display: inline-block; padding: 6px 14px; border: 1px solid var(--border); font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--slate); text-transform: uppercase; }
-  .tag.highlight { border-color: var(--petrol); color: var(--petrol); }
-
-  /* ---------- ABOUT / CTA ---------- */
-  #about-cs { text-align: left; }
-  .about-cs-text { font-size: 14.5px; color: var(--slate); line-height: 1.9; max-width: 700px; }
-  .about-cs-text strong { color: var(--petrol); font-weight: 600; }
-  .about-cs-text p + p { margin-top: 16px; }
-
-  #contact { text-align: center; }
-  .contact-title { font-family: 'Fraunces', serif; font-size: clamp(34px, 4.6vw, 54px); font-weight: 600; margin-bottom: 22px; letter-spacing: -1px; }
-  .contact-title em { font-style: italic; color: var(--petrol); }
-  .contact-sub { font-size: 14px; color: var(--slate); max-width: 480px; margin: 0 auto 40px; line-height: 1.8; }
-  .contact-links { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; }
-
-  .reveal { opacity: 0; transform: translateY(14px); transition: 0.7s cubic-bezier(0.16,1,0.3,1); }
-  .reveal.visible { opacity: 1; transform: translateY(0); }
-
-  @media (prefers-reduced-motion: reduce) {
-    .reveal { opacity: 1; transform: none; transition: none; }
-    html { scroll-behavior: auto; }
-  }
-
-  @media (max-width: 1000px) {
-    .layers-grid { grid-template-columns: 1fr; }
-    .structure-grid { grid-template-columns: 1fr; }
-    .demo-row { grid-template-columns: 1fr; }
-    .maturity-grid { grid-template-columns: 1fr; }
-    .highlight-item { grid-template-columns: 1fr; gap: 8px; }
-  }
-  @media (max-width: 900px) {
-    section { padding: 70px 24px; }
-    nav { padding: 18px 20px; }
-    .nav-links { display: none; }
-    #hero { padding: 120px 24px 56px; }
-    .section-header { flex-wrap: wrap; }
-  }
-</style>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
+<header><div class="w ni">
+  <a class="logo" href="index.html">Wellington Roveder</a>
+  <button class="burger" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu">Menu</button>
+  <nav id="menu">
+    <a href="index.html">Portfólio</a>
+    <a href="#problema">Problema</a>
+    <a href="#mvp">MVP</a>
+    <a href="#saas">SaaS</a>
+    <a href="#destaques">Destaques</a>
+    <a href="#demo">Demo</a>
+    <a href="#ci">CI/CD</a>
+  </nav>
+</div></header>
 
-<nav>
-  <a href="index.html" class="nav-logo">Wellington<span> Roveder</span></a>
-  <ul class="nav-links">
-    <li><a href="#problem">Problema</a></li>
-    <li><a href="#highlights">Destaques</a></li>
-    <li><a href="#ci">CI/CD</a></li>
-    <li><a href="#demo">Demo</a></li>
-    <li><a href="#roadmap">Maturidade</a></li>
-  </ul>
-  <a href="index.html" class="nav-back">← voltar ao portfólio</a>
-</nav>
-
-<section id="hero">
-  <div class="hero-content">
-    <div class="hero-tag">Case study técnico</div>
-    <h1 class="hero-name">Fecha<em>Bot.</em><br>Da dor real à arquitetura.</h1>
-    <p class="hero-desc">
-      Como um <strong>"cientista de dados de bolso"</strong> para pequenos e médios negócios
-      foi arquitetado, construído e endurecido em segurança — do zero até um pipeline
-      validado ponta a ponta com entrega real no WhatsApp.
-    </p>
-    <div class="hero-note">
-      <span class="hero-note-icon">i</span>
-      <p>Este é um repositório de <strong>case study</strong>: documentação, decisões de
-      arquitetura (ADRs) e demonstração em vídeo/print do produto funcionando. O código-fonte
-      do FechaBot é privado — aqui está o <strong>raciocínio</strong> por trás dele, não a
-      implementação.</p>
-    </div>
-    <div style="display:flex; gap:16px; flex-wrap:wrap;">
-      <a href="https://github.com/Wellington-Roveder/fechabot-case-study" target="_blank" class="btn-primary">Repositório completo no GitHub →</a>
-      <a href="index.html" class="btn-secondary">Ver portfólio ↗</a>
-    </div>
+<main>
+<section class="hero w">
+  <p class="eyebrow">Case study técnico</p>
+  <h1>FechaBot</h1>
+  <p class="lead">Da dor real à arquitetura: como um fechamento de caixa feito à mão virou um MVP em uso diário e agora um SaaS multi-tenant em desenvolvimento.</p>
+  <div class="card" style="max-width:640px;margin-bottom:24px"><p>O código do SaaS é privado. Esta página e o repositório do case study mostram o raciocínio por trás dele (arquitetura, decisões e segurança), não a implementação.</p></div>
+  <div class="btns">
+    <a class="btn p" href="https://github.com/Wellington-Roveder/fechabot-case-study" target="_blank" rel="noopener">Repositório do case study</a>
+    <a class="btn" href="https://github.com/Wellington-Roveder/FechaBot-MVP" target="_blank" rel="noopener">MVP no GitHub</a>
+    <a class="btn" href="index.html">Voltar ao portfólio</a>
   </div>
 </section>
 
-<section id="problem">
-  <div class="section-header reveal">
-    <span class="section-eyebrow">O contexto</span>
-    <div class="section-line"></div>
+<section class="sec" id="problema"><div class="w">
+  <h2>O problema</h2>
+  <p class="sub">Pequenos e médios negócios fecham o dia numa planilha e não têm equipe técnica para transformá-la em informação útil, na hora certa.</p>
+  <div class="g2">
+    <div class="card"><h3>01 · Automação</h3><p>Lê a planilha do negócio, aplica os filtros configurados e envia o resumo formatado pelo WhatsApp, sem intervenção manual.</p></div>
+    <div class="card"><h3>02 · Persistência</h3><p>Cada fechamento vira um registro no banco relacional, e a planilha original fica preservada no armazenamento de objetos.</p></div>
+    <div class="card"><h3>03 · Isolamento</h3><p>Todo dado pertence a um tenant, do schema do banco até a API. Um negócio nunca enxerga o outro.</p></div>
   </div>
-  <h2 class="section-title reveal" style="margin-bottom: 28px;">O problema</h2>
-  <div class="problem-text reveal">
-    <p>Grandes empresas têm equipes de dados e ferramentas como Power BI. <strong>Pequenos e
-    médios negócios</strong> — franquias, clínicas, distribuidoras, redes de varejo — fecham o
-    dia numa planilha Excel e não têm equipe técnica pra transformar isso em informação útil,
-    na hora certa, pra quem precisa decidir.</p>
-    <p>O FechaBot existe pra fechar essa lacuna: ler a planilha que o negócio já usa, aplicar
-    as regras que fazem sentido pra ele, e devolver a resposta no canal que ele já olha —
-    o WhatsApp — com histórico consultável por IA.</p>
-  </div>
-</section>
+</div></section>
 
-<section id="layers">
-  <div class="section-header reveal">
-    <span class="section-eyebrow">A solução</span>
-    <div class="section-line"></div>
-  </div>
-  <h2 class="section-title reveal" style="margin-bottom: 16px;">O que o FechaBot faz</h2>
-  <p class="section-sub reveal">Três camadas, cada uma resolvendo uma parte específica do problema.</p>
-  <div class="layers-grid">
-    <div class="layer-card reveal">
-      <div class="layer-num">01 — Automação</div>
-      <h3 class="layer-title">Fechamento automático</h3>
-      <p class="layer-desc">Lê a planilha do negócio, aplica os filtros configurados e dispara o resumo formatado no WhatsApp, no horário certo — sem intervenção manual.</p>
-    </div>
-    <div class="layer-card reveal">
-      <div class="layer-num">02 — Persistência</div>
-      <h3 class="layer-title">Histórico inteligente</h3>
-      <p class="layer-desc">Cada fechamento vira um registro persistido: banco de dados relacional + planilha original preservada no armazenamento de objetos.</p>
-    </div>
-    <div class="layer-card reveal">
-      <div class="layer-num">03 — IA</div>
-      <h3 class="layer-title">Analista sob demanda</h3>
-      <p class="layer-desc">O gestor conversa em linguagem natural com os próprios dados — como se tivesse um cientista de dados pessoal, sempre isolado por tenant.</p>
-    </div>
-  </div>
-</section>
+<section class="sec" id="mvp"><div class="w">
+  <h2>O MVP</h2>
+  <article class="card">
+    <span class="st">Em produção</span>
+    <p>Implantado na Pollo Loko, em São José dos Campos. Lê as planilhas do PDV, processa com Pandas e gera o relatório do dia pronto para o WhatsApp, distribuído como executável portátil. Reduziu o fechamento de caixa de 20 minutos para cerca de 30 segundos e está em uso diário desde o lançamento. Os requisitos foram levantados direto com o cliente, com manutenção contínua desde então.</p>
+    <div class="chips"><span class="chip">Python</span><span class="chip">Pandas</span><span class="chip">Tkinter</span><span class="chip">PyInstaller</span></div>
+    <div class="links"><a class="btn" href="https://github.com/Wellington-Roveder/FechaBot-MVP" target="_blank" rel="noopener">Código do MVP</a></div>
+  </article>
+</div></section>
 
-<section id="highlights">
-  <div class="section-header reveal">
-    <span class="section-eyebrow">Raciocínio técnico</span>
-    <div class="section-line"></div>
+<section class="sec" id="saas"><div class="w">
+  <h2>O SaaS</h2>
+  <p class="sub">A partir da validação do MVP, qualquer negócio poderá configurar seus filtros e seu template de mensagem, enviar a planilha e receber o resumo no WhatsApp.</p>
+  <article class="card">
+    <span class="st">Em desenvolvimento</span>
+    <p><strong>10 de 11 sprints concluídos.</strong> Falta a sprint de cobrança, deploy e onboarding. O envio real de mensagens já foi testado ponta a ponta, com entrega confirmada no WhatsApp.</p>
+    <div class="bar" role="img" aria-label="10 de 11 sprints concluídos"><i style="width:91%"></i></div>
+    <div class="chips"><span class="chip">FastAPI</span><span class="chip">Next.js</span><span class="chip">PostgreSQL</span><span class="chip">Redis</span><span class="chip">Celery</span><span class="chip">Docker</span><span class="chip">Cloudflare R2</span><span class="chip">JWT</span><span class="chip">Meta Cloud API</span></div>
+  </article>
+</div></section>
+
+<section class="sec" id="destaques"><div class="w">
+  <h2>Decisões técnicas</h2>
+  <p class="sub">Cinco decisões representativas, cada uma detalhada como ADR no repositório.</p>
+  <div class="g2">
+    <div class="card"><h3>Sessão sem confiar só no JWT</h3><p>Cookie httpOnly, CSRF double-submit e allowlist de sessão no Redis, para que uma sessão possa ser revogada de verdade antes de o token expirar.</p></div>
+    <div class="card"><h3>Intenção do cliente vs. realidade externa</h3><p>Quando a Meta reclassifica a categoria de um template, o sistema guarda a categoria pedida e a efetiva como fontes de verdade distintas, com histórico.</p></div>
+    <div class="card"><h3>Envio assíncrono e resiliente</h3><p>Fila no Celery, retry automático e rastro persistido de toda tentativa, com sucesso ou falha. Nada é descartado em silêncio.</p></div>
+    <div class="card"><h3>Segurança como processo</h3><p>Ciclos dedicados de revisão, cada um com achado, correção e teste de verificação documentados, e não uma auditoria única no fim.</p></div>
+    <div class="card"><h3>Isolamento multi-tenant estrutural</h3><p>Todo dado tem tenant_id, e toda rota autenticada filtra por ele a partir do JWT, nunca de parâmetro da requisição. Sem exceção.</p></div>
   </div>
-  <h2 class="section-title reveal" style="margin-bottom: 16px;">Destaques técnicos</h2>
-  <p class="section-sub reveal">Cinco decisões representativas do nível de raciocínio envolvido — cada uma detalhada como ADR no repositório.</p>
+</div></section>
 
-  <div class="highlight-list">
-    <div class="highlight-item reveal">
-      <span class="highlight-tag">ADR · Sessão</span>
-      <div>
-        <h3 class="highlight-title">Modelo de sessão sem confiar só no JWT</h3>
-        <p class="highlight-desc">Cookie <code>httpOnly</code> + CSRF double-submit + allowlist de sessão via Redis, pra que uma sessão possa ser revogada de verdade — não só do lado do cliente — antes da expiração natural do token.</p>
-      </div>
-    </div>
-    <div class="highlight-item reveal">
-      <span class="highlight-tag">ADR · Integração</span>
-      <div>
-        <h3 class="highlight-title">Intenção do cliente vs. realidade externa</h3>
-        <p class="highlight-desc">Quando a Meta reclassifica a categoria de um template do WhatsApp automaticamente, o sistema rastreia <code>requested_category</code> (o que o cliente escolheu) e <code>effective_category</code> (o que está valendo de fato) como fontes de verdade distintas, com histórico completo.</p>
-      </div>
-    </div>
-    <div class="highlight-item reveal">
-      <span class="highlight-tag">ADR · Pipeline</span>
-      <div>
-        <h3 class="highlight-title">Envio assíncrono e resiliente</h3>
-        <p class="highlight-desc">Fila via Celery, retry automático, e toda tentativa — sucesso ou falha — deixa rastro persistido. Nada é descartado silenciosamente.</p>
-      </div>
-    </div>
-    <div class="highlight-item reveal">
-      <span class="highlight-tag">Processo</span>
-      <div>
-        <h3 class="highlight-title">Segurança como processo, não evento único</h3>
-        <p class="highlight-desc">Múltiplos ciclos de revisão dedicados, cada um com achados documentados, correção aplicada e teste de verificação — não uma auditoria única no fim.</p>
-      </div>
-    </div>
-    <div class="highlight-item reveal">
-      <span class="highlight-tag">Arquitetura</span>
-      <div>
-        <h3 class="highlight-title">Isolamento multi-tenant como regra estrutural</h3>
-        <p class="highlight-desc">Todo dado tem <code>tenant_id</code>; toda rota autenticada filtra por ele a partir do JWT — nunca de parâmetro de requisição. Regra sem exceção, do banco à API.</p>
-      </div>
-    </div>
+<section class="sec" id="demo"><div class="w">
+  <h2>Demonstração</h2>
+  <p class="sub">O produto funcionando de ponta a ponta. As mídias vêm do repositório do case study.</p>
+  <div class="demo"><h3>Landing page e fluxo geral</h3><img src="https://raw.githubusercontent.com/Wellington-Roveder/fechabot-case-study/main/media/videos/landing.gif" alt="Landing page do FechaBot" loading="lazy"></div>
+  <div class="demo"><h3>Login com MFA</h3><p>Sessão por cookie httpOnly, com verificação TOTP como segunda etapa.</p><img src="https://raw.githubusercontent.com/Wellington-Roveder/fechabot-case-study/main/media/videos/login_mfa.gif" alt="Login com MFA" loading="lazy"></div>
+  <div class="demo"><h3>Tour pelo dashboard</h3><img src="https://raw.githubusercontent.com/Wellington-Roveder/fechabot-case-study/main/media/videos/dashboard_tour.gif" alt="Tour pelo dashboard" loading="lazy"></div>
+  <div class="demo"><h3>Configuração de filtros e template</h3><p>Upload da planilha de referência com detecção automática de colunas, condições compostas, variáveis clicáveis e preview em tempo real antes do envio.</p>
+    <div class="g2"><img src="https://raw.githubusercontent.com/Wellington-Roveder/fechabot-case-study/main/media/videos/filter_config.gif" alt="Configuração de filtros" loading="lazy"><img src="https://raw.githubusercontent.com/Wellington-Roveder/fechabot-case-study/main/media/videos/template_config.gif" alt="Editor de template" loading="lazy"></div></div>
+  <div class="demo"><h3>Mensagem entregue no WhatsApp real</h3><p>Template aprovado pela Meta e pipeline validado da planilha até a mensagem chegar. Telefones e destinatários são valores de teste, nunca dado real de cliente.</p><img src="https://raw.githubusercontent.com/Wellington-Roveder/fechabot-case-study/main/media/screenshots/whatsapp_delivery_confirmation.png" alt="Mensagens entregues no WhatsApp" loading="lazy"></div>
+</div></section>
+
+<section class="sec" id="ci"><div class="w">
+  <h2>CI/CD e testes</h2>
+  <p class="sub">Todo push passa por um pipeline com lint, aplicação do schema do banco e testes, com cobertura mínima travada.</p>
+  <dl class="stats" style="margin-top:0;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+    <div><dt>66</dt><dd>Testes automatizados a cada push: webhook, filtros, processamento, serviços e armazenamento</dd></div>
+    <div><dt>46,9%</dt><dd>Cobertura atual, com piso de 40% no pipeline (o build quebra abaixo disso)</dd></div>
+    <div><dt>21</dt><dd>Execuções do GitHub Actions, incluindo falhas reais corrigidas antes do merge</dd></div>
+  </dl>
+  <p class="sub" style="margin-top:24px">O pipeline roda <code>ruff</code> e depois <code>pytest --cov</code>. A régua de cobertura sobe junto com os testes novos, em vez de perseguir um número bonito sem substância.</p>
+  <h3>Como navegar o repositório</h3>
+  <pre>fechabot-case-study/
+├── README.md        visão geral
+├── architecture/    diagramas e visão geral
+├── decisions/       ADRs: decisões, alternativas, trade-offs
+├── security/        achado, correção e verificação
+├── roadmap/         feito, pendente, débitos técnicos
+└── media/           telas, diagramas e GIFs</pre>
+</div></section>
+
+<section class="sec cta"><div class="w">
+  <h2>Quer ver mais?</h2>
+  <p class="sub" style="margin:0 auto">O case study é público. Para uma demonstração ao vivo, me chame.</p>
+  <div class="btns">
+    <a class="btn p" href="mailto:rovederwellington@gmail.com?subject=FechaBot%20-%20quero%20ver%20uma%20demo">Pedir demo por e-mail</a>
+    <a class="btn" href="https://github.com/Wellington-Roveder/fechabot-case-study" target="_blank" rel="noopener">Case study no GitHub</a>
+    <a class="btn" href="index.html">Voltar ao portfólio</a>
   </div>
-</section>
+</div></section>
+</main>
 
-<section id="structure">
-  <div class="section-header reveal">
-    <span class="section-eyebrow">Navegação</span>
-    <div class="section-line"></div>
-  </div>
-  <h2 class="section-title reveal" style="margin-bottom: 16px;">Como navegar o repositório</h2>
-  <p class="section-sub reveal">Organizado pra quem quer entender a decisão, não só ler o resultado.</p>
-  <div class="structure-grid">
-    <pre class="repo-tree reveal">fechabot-case-study/
-├── README.md            <span class="comment">— visão geral</span>
-├── <span class="folder">architecture/</span>       <span class="comment">— visão geral e diagramas</span>
-├── <span class="folder">decisions/</span>          <span class="comment">— ADRs: decisões, alternativas, trade-offs</span>
-├── <span class="folder">security/</span>           <span class="comment">— achados → correção → por que importa</span>
-├── <span class="folder">roadmap/</span>            <span class="comment">— feito, pendente, débitos técnicos</span>
-└── <span class="folder">media/</span>
-    ├── screenshots/  <span class="comment">— telas do produto</span>
-    ├── diagrams/     <span class="comment">— arquitetura e fluxo</span>
-    └── videos/       <span class="comment">— GIFs de fluxos completos</span></pre>
-    <ul class="structure-note-list reveal">
-      <li><strong>architecture/</strong> — como as peças se encaixam: API, filas, banco, storage e IA, com diagramas.</li>
-      <li><strong>decisions/</strong> — cada ADR documenta o problema, as alternativas consideradas e por que a escolha final venceu.</li>
-      <li><strong>security/</strong> — o histórico completo de revisão: o que foi encontrado, como foi corrigido, como foi verificado.</li>
-      <li><strong>roadmap/</strong> — maturidade real do produto, sem maquiagem: o que está pronto e o que ainda falta.</li>
-    </ul>
-  </div>
-</section>
-
-<section id="demo">
-  <div class="section-header reveal">
-    <span class="section-eyebrow">Prova</span>
-    <div class="section-line"></div>
-  </div>
-  <h2 class="section-title reveal" style="margin-bottom: 16px;">Demonstração</h2>
-  <p class="section-sub reveal">O produto funcionando de ponta a ponta — não só slides sobre ele.</p>
-
-  <div class="demo-block reveal">
-    <div class="demo-head">
-      <h3 class="demo-title">Landing page e fluxo geral</h3>
-      <span class="demo-ref">media/videos/landing.gif</span>
-    </div>
-    <div class="demo-media"><img src="https://raw.githubusercontent.com/Wellington-Roveder/fechabot-case-study/main/media/videos/landing.gif" alt="Landing page do FechaBot" loading="lazy"></div>
-  </div>
-
-  <div class="demo-block reveal">
-    <div class="demo-head">
-      <h3 class="demo-title">Login com MFA</h3>
-      <span class="demo-ref">media/videos/login_mfa.gif</span>
-    </div>
-    <p class="demo-desc">Sessão via cookie <code>httpOnly</code>, com verificação TOTP como segunda etapa — detalhado na ADR de modelo de sessão.</p>
-    <div class="demo-media"><img src="https://raw.githubusercontent.com/Wellington-Roveder/fechabot-case-study/main/media/videos/login_mfa.gif" alt="Login com MFA" loading="lazy"></div>
-  </div>
-
-  <div class="demo-block reveal">
-    <div class="demo-head">
-      <h3 class="demo-title">Tour pelo dashboard</h3>
-      <span class="demo-ref">media/videos/dashboard_tour.gif</span>
-    </div>
-    <p class="demo-desc">Chat com o FechaBot IA, tela de segurança (2FA) e configurações.</p>
-    <div class="demo-media"><img src="https://raw.githubusercontent.com/Wellington-Roveder/fechabot-case-study/main/media/videos/dashboard_tour.gif" alt="Tour pelo dashboard" loading="lazy"></div>
-  </div>
-
-  <div class="demo-block reveal">
-    <div class="demo-head">
-      <h3 class="demo-title">Configuração de filtros e template</h3>
-    </div>
-    <p class="demo-desc">Upload da planilha de referência com detecção automática de colunas, condições compostas, variáveis clicáveis e preview em tempo real antes do envio.</p>
-    <div class="demo-row">
-      <div class="demo-media"><img src="https://raw.githubusercontent.com/Wellington-Roveder/fechabot-case-study/main/media/videos/filter_config.gif" alt="Configuração de filtros" loading="lazy"></div>
-      <div class="demo-media"><img src="https://raw.githubusercontent.com/Wellington-Roveder/fechabot-case-study/main/media/videos/template_config.gif" alt="Editor de template" loading="lazy"></div>
-    </div>
-  </div>
-
-  <div class="demo-block reveal">
-    <div class="demo-head">
-      <h3 class="demo-title">Prova end-to-end: mensagem entregue no WhatsApp real</h3>
-      <span class="demo-ref">media/screenshots/whatsapp_delivery_confirmation.png</span>
-    </div>
-    <p class="demo-desc">Template aprovado pela Meta, pipeline completo validado ponta a ponta — da planilha até a mensagem chegando de fato no WhatsApp.</p>
-    <div class="demo-media"><img src="https://raw.githubusercontent.com/Wellington-Roveder/fechabot-case-study/main/media/screenshots/whatsapp_delivery_confirmation.png" alt="Mensagens entregues no WhatsApp" loading="lazy"></div>
-    <p class="demo-caption">Números de telefone e dados de destinatário são valores de teste — nunca dado real de cliente.</p>
-  </div>
-</section>
-
-<section id="ci">
-  <div class="section-header reveal">
-    <span class="section-eyebrow">Engenharia de verdade</span>
-    <div class="section-line"></div>
-  </div>
-  <h2 class="section-title reveal" style="margin-bottom: 16px;">CI/CD e disciplina de testes</h2>
-  <p class="section-sub reveal">Todo push passa por um pipeline automatizado antes de ir pra branch principal — lint, aplicação de schema de banco e suíte de testes com cobertura mínima travada.</p>
-
-  <div class="maturity-grid">
-    <div class="maturity-card reveal">
-      <div class="maturity-num">66</div>
-      <div class="maturity-label">Testes automatizados rodando a cada push — cobrindo webhook, filtros, processamento, serviços e armazenamento</div>
-    </div>
-    <div class="maturity-card reveal">
-      <div class="maturity-num">46,9%</div>
-      <div class="maturity-label">Cobertura de código atual, subindo sprint a sprint — piso travado em 40% no pipeline (build quebra abaixo disso)</div>
-    </div>
-    <div class="maturity-card reveal">
-      <div class="maturity-num">21</div>
-      <div class="maturity-label">Execuções de workflow no GitHub Actions até agora, incluindo falhas reais corrigidas antes do merge</div>
-    </div>
-  </div>
-
-  <div class="highlight-list">
-    <div class="highlight-item reveal">
-      <span class="highlight-tag">Pipeline</span>
-      <div>
-        <h3 class="highlight-title">Gate de qualidade, não só "rodou"</h3>
-        <p class="highlight-desc">O pipeline aplica o schema do banco, roda lint (<code>ruff</code>) e só então executa a suíte com <code>pytest --cov</code>. Se a cobertura cair abaixo de 40%, o build quebra — a régua sobe aos poucos, junto com os testes novos, em vez de perseguir um número bonito sem substância.</p>
-      </div>
-    </div>
-    <div class="highlight-item reveal">
-      <span class="highlight-tag">Processo</span>
-      <div>
-        <h3 class="highlight-title">Falha faz parte do processo, documentada</h3>
-        <p class="highlight-desc">O histórico de execuções mostra PRs que quebraram o CI e foram corrigidos antes do merge — como o webhook retornando 500 em vez de 400 para payload malformado, pego pelo próprio pipeline antes de chegar em produção.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="roadmap">
-  <div class="section-header reveal">
-    <span class="section-eyebrow">Onde está hoje</span>
-    <div class="section-line"></div>
-  </div>
-  <h2 class="section-title reveal" style="margin-bottom: 16px;">Roadmap e maturidade</h2>
-  <p class="section-sub reveal">O produto evoluiu em sprints, cada um com escopo fechado e testado antes de avançar.</p>
-
-  <div class="maturity-grid">
-    <div class="maturity-card reveal">
-      <div class="maturity-num">10/11</div>
-      <div class="maturity-label">Sprints concluídos no FechaBot SaaS — do schema multi-tenant à segurança (rate limit, headers, secrets)</div>
-    </div>
-    <div class="maturity-card reveal">
-      <div class="maturity-num">2+</div>
-      <div class="maturity-label">Ciclos dedicados de revisão de segurança, cada um com achado → correção → verificação documentados</div>
-    </div>
-    <div class="maturity-card reveal">
-      <div class="maturity-num">1</div>
-      <div class="maturity-label">Entrega real confirmada no WhatsApp — pipeline validado ponta a ponta, não só em ambiente de teste</div>
-    </div>
-  </div>
-
-  <div class="stack-strip reveal" style="margin-bottom: 40px;">
-    <span class="tag highlight">Python</span>
-    <span class="tag highlight">FastAPI</span>
-    <span class="tag highlight">Next.js</span>
-    <span class="tag highlight">PostgreSQL</span>
-    <span class="tag">Redis / Celery</span>
-    <span class="tag">Claude API</span>
-    <span class="tag">Docker</span>
-    <span class="tag">Cloudflare R2</span>
-    <span class="tag">Meta Cloud API</span>
-  </div>
-
-  <div class="roadmap-cta reveal">
-    <a href="https://github.com/Wellington-Roveder/fechabot-case-study/tree/main/roadmap" target="_blank" class="btn-primary">Ver roadmap detalhado →</a>
-    <a href="https://github.com/Wellington-Roveder/fechabot-case-study/tree/main/security" target="_blank" class="btn-secondary">Ver revisões de segurança</a>
-  </div>
-</section>
-
-<section id="about-cs">
-  <div class="section-header reveal">
-    <span class="section-eyebrow">Sobre este case study</span>
-    <div class="section-line"></div>
-  </div>
-  <h2 class="section-title reveal" style="margin-bottom: 28px;">Por que documentei assim</h2>
-  <div class="about-cs-text reveal">
-    <p>Sou estudante de <strong>Ciência da Computação</strong> (Anhanguera SJC, 3º semestre) em
-    transição de carreira para desenvolvimento de software. Antes disso, passei cerca de uma
-    década em gestão operacional — bagagem que hoje se traduz menos em "anos de experiência" e
-    mais em hábitos que aplico diariamente no código: comunicar decisões com clareza, priorizar
-    sob pressão, documentar o porquê das coisas e trabalhar bem debaixo de prazo.</p>
-    <p>O FechaBot é o projeto onde mais apliquei isso: <strong>cada sprint documentado</strong>,
-    cada decisão de segurança justificada, cada erro tratado como aprendizado registrado — não
-    escondido.</p>
-  </div>
-</section>
-
-<section id="contact">
-  <h2 class="contact-title reveal">Quer ver o <em>código</em>?</h2>
-  <p class="contact-sub reveal">O case study é público. Se você é recrutador ou dono de negócio e quer uma demo ao vivo, me chama.</p>
-  <div class="contact-links reveal">
-    <a href="https://github.com/Wellington-Roveder/fechabot-case-study" target="_blank" class="btn-primary">Repositório do case study</a>
-    <a href="mailto:rovederwellington@gmail.com?subject=FechaBot%20-%20quero%20ver%20uma%20demo" class="btn-secondary">Pedir demo</a>
-    <a href="index.html" class="btn-secondary">Voltar ao portfólio</a>
-  </div>
-</section>
-
-<footer style="padding: 48px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--slate-light); border-top: 1px solid var(--border);">
-  © 2026 Wellington Roveder • Case study do FechaBot.
-</footer>
-
-<script>
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-      }
-    });
-  }, { threshold: 0.12 });
-
-  if (!reduceMotion) {
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-  } else {
-    document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
-  }
-</script>
-
+<footer><div class="w">© 2026 Wellington Roveder · Case study do FechaBot</div></footer>
+<script src="script.js"></script>
 </body>
 </html>
